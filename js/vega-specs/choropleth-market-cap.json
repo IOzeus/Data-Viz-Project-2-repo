@@ -1,0 +1,96 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 430,
+  "params": [
+    {
+      "name": "year",
+      "value": 2024,
+      "bind": {"input": "range", "min": 1990, "max": 2024, "step": 1, "name": "Year "}
+    }
+  ],
+  "projection": {"type": "equalEarth"},
+  "layer": [
+    {
+      "data": {"sphere": true},
+      "mark": {"type": "geoshape", "fill": "#f3eee2", "stroke": "#e2dccd", "strokeWidth": 0.75}
+    },
+    {
+      "data": {
+        "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2/data/world-110m.json",
+        "format": {"type": "topojson", "feature": "countries"}
+      },
+      "mark": {"type": "geoshape", "fill": "#ddd6c5", "stroke": "#faf6ee", "strokeWidth": 0.5}
+    },
+    {
+      "data": {"url": "data/market-cap-by-country.csv", "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_GDP_Pct": "number", "MarketCap_Billion_USD": "number", "Code_Numeric": "number"}}},
+      "transform": [
+        {"filter": "datum.Year == year && datum.Code_Numeric > 0"},
+        {
+          "lookup": "Code_Numeric",
+          "from": {
+            "data": {
+              "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2/data/world-110m.json",
+              "format": {"type": "topojson", "feature": "countries"}
+            },
+            "key": "id"
+          },
+          "as": "geo"
+        },
+        {"filter": "isValid(datum.geo)"},
+        {
+          "lookup": "Code",
+          "from": {"data": {"url": "data/countries.csv", "format": {"type": "csv", "parse": {"Lon": "number", "Lat": "number"}}}, "key": "Code", "fields": ["Name"]}
+        },
+        {
+          "calculate": "datum.MarketCap_Billion_USD >= 1000 ? '$' + format(datum.MarketCap_Billion_USD / 1000, '.2f') + ' trillion' : '$' + format(datum.MarketCap_Billion_USD, datum.MarketCap_Billion_USD < 10 ? '.1f' : ',.0f') + ' billion'",
+          "as": "CapLabel"
+        },
+        {"calculate": "format(datum.MarketCap_GDP_Pct, ',.0f') + '%'", "as": "PctLabel"},
+        {
+          "calculate": "datum.MarketCap_GDP_Pct < 25 ? 'Under 25%' : datum.MarketCap_GDP_Pct < 50 ? '25–50%' : datum.MarketCap_GDP_Pct < 100 ? '50–100%' : datum.MarketCap_GDP_Pct < 200 ? '100–200%' : 'Over 200%'",
+          "as": "Band"
+        }
+      ],
+      "mark": {"type": "geoshape", "stroke": "#faf6ee", "strokeWidth": 0.5},
+      "encoding": {
+        "shape": {"field": "geo", "type": "geojson"},
+        "color": {
+          "field": "Band",
+          "type": "ordinal",
+          "scale": {
+            "domain": ["Under 25%", "25–50%", "50–100%", "100–200%", "Over 200%"],
+            "range": ["#deebf7", "#9ecae1", "#5a9bd0", "#2a6cb0", "#0b3d7a"]
+          },
+          "legend": {
+            "title": "Stock market value as % of GDP",
+            "orient": "bottom-left",
+            "symbolType": "square",
+            "symbolSize": 140,
+            "symbolStrokeWidth": 0,
+            "symbolOpacity": 1
+          }
+        },
+        "stroke": {
+          "condition": {"test": "datum.Code == 'AUS'", "value": "#e8590c"},
+          "value": "#faf6ee"
+        },
+        "strokeWidth": {
+          "condition": {"test": "datum.Code == 'AUS'", "value": 2},
+          "value": 0.5
+        },
+        "tooltip": [
+          {"field": "Name", "title": "Country"},
+          {"field": "Year", "title": "Year"},
+          {"field": "PctLabel", "title": "Market as % of GDP"},
+          {"field": "CapLabel", "title": "Stock market value"}
+        ]
+      }
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "legend": {"titleFontSize": 11, "labelFontSize": 11, "titleColor": "#555", "labelColor": "#555"}
+  }
+}

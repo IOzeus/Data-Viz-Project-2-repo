@@ -1,0 +1,129 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 380,
+  "layer": [
+    {
+      "data": {
+        "values": [
+          {"Year": 2000, "Event": "Dot-com crash"},
+          {"Year": 2008, "Event": "Global Financial Crisis"},
+          {"Year": 2020, "Event": "COVID-19"}
+        ]
+      },
+      "encoding": {"x": {"field": "Year", "type": "quantitative", "scale": {"domain": [1990, 2024]}}},
+      "layer": [
+        {"mark": {"type": "rule", "color": "#bbbbbb", "strokeDash": [3, 3]}},
+        {
+          "mark": {"type": "text", "align": "left", "dx": 4, "y": 4, "baseline": "top", "fontSize": 10.5, "color": "#888888"},
+          "encoding": {"text": {"field": "Event"}}
+        }
+      ]
+    },
+    {
+      "data": {"url": "data/market-cap-by-country.csv", "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_GDP_Pct": "number", "MarketCap_Billion_USD": "number", "Code_Numeric": "number"}}},
+      "transform": [
+        {"filter": "datum.Year <= 2024 && indexof(['AUS','USA','JPN','GBR','CAN','CHN','IND','DEU'], datum.Code) >= 0"},
+        {
+          "lookup": "Code",
+          "from": {"data": {"url": "data/countries.csv", "format": {"type": "csv", "parse": {"Lon": "number", "Lat": "number"}}}, "key": "Code", "fields": ["Name"]}
+        },
+        {"calculate": "format(datum.MarketCap_GDP_Pct, ',.0f') + '%'", "as": "PctLabel"},
+        {"joinaggregate": [{"op": "max", "field": "Year", "as": "LastYear"}], "groupby": ["Code"]}
+      ],
+      "encoding": {
+        "x": {
+          "field": "Year",
+          "type": "quantitative",
+          "scale": {"domain": [1990, 2024]},
+          "axis": {"format": "d", "title": null, "tickCount": 8, "grid": false}
+        },
+        "y": {
+          "field": "MarketCap_GDP_Pct",
+          "type": "quantitative",
+          "scale": {"domain": [0, 250], "clamp": true},
+          "axis": {"title": "Stock market value as % of GDP", "labelExpr": "datum.value + '%'", "gridColor": "#efefef", "tickCount": 5}
+        }
+      },
+      "layer": [
+        {
+          "mark": {"type": "line", "interpolate": "monotone"},
+          "encoding": {
+            "detail": {"field": "Code"},
+            "color": {
+              "condition": [
+                {"test": "datum.Code == 'AUS'", "value": "#e8590c"},
+                {"param": "hover", "empty": false, "value": "#2f6fb0"}
+              ],
+              "value": "#cfcfcf"
+            },
+            "strokeWidth": {
+              "condition": [
+                {"test": "datum.Code == 'AUS'", "value": 3},
+                {"param": "hover", "empty": false, "value": 2.5}
+              ],
+              "value": 1.5
+            },
+            "order": {"field": "Year"}
+          }
+        },
+        {
+          "params": [
+            {
+              "name": "hover",
+              "select": {"type": "point", "fields": ["Code"], "on": "pointerover", "clear": "pointerout", "nearest": true}
+            }
+          ],
+          "mark": {"type": "circle", "size": 60, "opacity": 0},
+          "encoding": {
+            "tooltip": [
+              {"field": "Name", "title": "Country"},
+              {"field": "Year", "title": "Year"},
+              {"field": "PctLabel", "title": "Market as % of GDP"}
+            ]
+          }
+        },
+        {
+          "transform": [{"filter": "datum.Year == datum.LastYear"}],
+          "mark": {"type": "text", "align": "left", "dx": 6, "fontSize": 11, "fontWeight": 600},
+          "encoding": {
+            "text": {"field": "Name"},
+            "color": {
+              "condition": [
+                {"test": "datum.Code == 'AUS'", "value": "#b8430a"},
+                {"param": "hover", "empty": false, "value": "#2f6fb0"}
+              ],
+              "value": "#777777"
+            },
+            "opacity": {
+              "condition": [
+                {"test": "datum.Code == 'AUS' || datum.Code == 'USA'", "value": 1},
+                {"param": "hover", "empty": false, "value": 1}
+              ],
+              "value": 0
+            }
+          }
+        },
+        {
+          "transform": [
+            {"filter": "datum.Code == 'AUS' && (datum.Year == 2007 || datum.Year == 2008)"},
+            {"calculate": "datum.Year == 2007 ? '2007 peak: ' + datum.PctLabel : 'GFC low: ' + datum.PctLabel", "as": "Note"}
+          ],
+          "layer": [
+            {"mark": {"type": "circle", "size": 50, "color": "#e8590c", "opacity": 1, "stroke": "#faf6ee", "strokeWidth": 1.5}},
+            {
+              "mark": {"type": "text", "align": "right", "dx": -8, "fontSize": 11, "fontWeight": 600, "color": "#b8430a"},
+              "encoding": {"text": {"field": "Note"}}
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "padding": {"left": 5, "top": 5, "bottom": 5, "right": 95},
+    "axis": {"labelFontSize": 11, "titleFontSize": 11, "labelColor": "#666", "titleColor": "#666", "domainColor": "#ccc", "tickColor": "#ccc"}
+  }
+}

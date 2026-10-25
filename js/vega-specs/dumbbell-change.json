@@ -1,0 +1,102 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": {"step": 19},
+  "data": {"url": "data/market-cap-by-country.csv", "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_GDP_Pct": "number", "MarketCap_Billion_USD": "number", "Code_Numeric": "number"}}},
+  "transform": [
+    {"filter": "(datum.Year == 2004 || datum.Year == 2024) && datum.Code != 'HKG'"},
+    {"calculate": "datum.Year == 2024 ? datum.MarketCap_Billion_USD : 0", "as": "Cap24"},
+    {"calculate": "datum.Year == 2024 ? datum.MarketCap_GDP_Pct : null", "as": "Pct24Raw"},
+    {"calculate": "datum.Year == 2004 ? datum.MarketCap_GDP_Pct : null", "as": "Pct04Raw"},
+    {
+      "joinaggregate": [
+        {"op": "count", "as": "Years"},
+        {"op": "max", "field": "Cap24", "as": "Cap2024"},
+        {"op": "max", "field": "Pct24Raw", "as": "Pct2024"},
+        {"op": "max", "field": "Pct04Raw", "as": "Pct2004"}
+      ],
+      "groupby": ["Code"]
+    },
+    {"filter": "datum.Years == 2 && datum.Cap2024 >= 100"},
+    {
+      "lookup": "Code",
+      "from": {"data": {"url": "data/countries.csv", "format": {"type": "csv", "parse": {"Lon": "number", "Lat": "number"}}}, "key": "Code", "fields": ["Name"]}
+    },
+    {"calculate": "toString(datum.Year)", "as": "YearLabel"},
+    {"calculate": "datum.Pct2024 - datum.Pct2004", "as": "Change"},
+    {"calculate": "format(datum.Pct2004, ',.0f') + '% → ' + format(datum.Pct2024, ',.0f') + '%'", "as": "ChangeLabel"}
+  ],
+  "encoding": {
+    "y": {
+      "field": "Name",
+      "type": "nominal",
+      "sort": {"field": "Pct2024", "op": "max", "order": "descending"},
+      "axis": {
+        "title": null,
+        "domain": false,
+        "ticks": false,
+        "labelPadding": 8,
+        "labelFontWeight": {"expr": "datum.label == 'Australia' ? 700 : 400"},
+        "labelColor": {"expr": "datum.label == 'Australia' ? '#b8430a' : '#555555'"}
+      }
+    }
+  },
+  "layer": [
+    {
+      "mark": {"type": "rule", "strokeWidth": 2},
+      "encoding": {
+        "x": {"field": "Pct2004", "type": "quantitative"},
+        "x2": {"field": "Pct2024"},
+        "color": {
+          "condition": {"test": "datum.Code == 'AUS'", "value": "#f4b28a"},
+          "value": "#dddddd"
+        }
+      }
+    },
+    {
+      "mark": {"type": "circle", "size": 70, "opacity": 1, "stroke": "#faf6ee", "strokeWidth": 1.5},
+      "encoding": {
+        "x": {
+          "field": "MarketCap_GDP_Pct",
+          "type": "quantitative",
+          "axis": {"title": "Stock market value as % of GDP", "orient": "top", "labelExpr": "datum.value + '%'", "gridColor": "#f0f0f0", "domain": false, "ticks": false}
+        },
+        "color": {
+          "field": "YearLabel",
+          "type": "nominal",
+          "scale": {"domain": ["2004", "2024"], "range": ["#b5b5b5", "#2f6fb0"]},
+          "legend": {"title": null, "orient": "bottom", "direction": "horizontal", "symbolStrokeWidth": 0}
+        },
+        "tooltip": [
+          {"field": "Name", "title": "Country"},
+          {"field": "ChangeLabel", "title": "2004 → 2024"}
+        ]
+      }
+    },
+    {
+      "transform": [{"filter": "datum.Code == 'AUS' && datum.Year == 2024"}],
+      "mark": {"type": "circle", "size": 90, "color": "#e8590c", "opacity": 1, "stroke": "#faf6ee", "strokeWidth": 1.5},
+      "encoding": {
+        "x": {"field": "MarketCap_GDP_Pct", "type": "quantitative"},
+        "tooltip": [
+          {"field": "Name", "title": "Country"},
+          {"field": "ChangeLabel", "title": "2004 → 2024"}
+        ]
+      }
+    },
+    {
+      "transform": [{"filter": "datum.Code == 'AUS' && datum.Year == 2024"}],
+      "mark": {"type": "text", "align": "left", "dx": 10, "fontSize": 11, "fontWeight": 600, "color": "#b8430a"},
+      "encoding": {
+        "x": {"field": "Pct2004", "type": "quantitative"},
+        "text": {"value": "Australia: 126% → 99%"}
+      }
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "axis": {"labelFontSize": 11, "titleFontSize": 11, "labelColor": "#666", "titleColor": "#666"},
+    "legend": {"labelFontSize": 11, "labelColor": "#555"}
+  }
+}

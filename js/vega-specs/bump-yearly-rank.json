@@ -1,0 +1,87 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 300,
+  "data": {"url": "data/share-price-index.csv", "format": {"type": "csv", "parse": {"Index": "number"}}},
+  "transform": [
+    {"filter": "indexof(['AUS','USA','JPN','DEU','HKG','KOR','CAN','CHE'], datum.Code) >= 0 && substring(datum.Month, 5, 7) == '12'"},
+    {"calculate": "toNumber(substring(datum.Month, 0, 4))", "as": "Year"},
+    {
+      "window": [{"op": "lag", "field": "Index", "as": "Prev"}],
+      "groupby": ["Code"],
+      "sort": [{"field": "Year"}]
+    },
+    {"filter": "datum.Year >= 2007 && datum.Year <= 2016"},
+    {"calculate": "datum.Index / datum.Prev - 1", "as": "Return"},
+    {
+      "window": [{"op": "row_number", "as": "Rank"}],
+      "groupby": ["Year"],
+      "sort": [{"field": "Return", "order": "descending"}]
+    },
+    {
+      "lookup": "Code",
+      "from": {"data": {"url": "data/countries.csv"}, "key": "Code", "fields": ["Name"]}
+    },
+    {"calculate": "(datum.Return > 0 ? '+' : '') + format(datum.Return, '.0%')", "as": "ReturnLabel"}
+  ],
+  "encoding": {
+    "x": {"field": "Year", "type": "ordinal", "axis": {"title": null, "labelAngle": 0, "domain": false, "ticks": false, "offset": 22}},
+    "y": {"field": "Rank", "type": "ordinal", "axis": {"title": "Rank (1 = best year)", "domain": false, "ticks": false}},
+    "detail": {"field": "Code"}
+  },
+  "layer": [
+    {
+      "mark": {"type": "line", "interpolate": "monotone"},
+      "encoding": {
+        "color": {
+          "condition": [
+            {"test": "datum.Code == 'AUS'", "value": "#e8590c"},
+            {"param": "pick", "empty": false, "value": "#2f6fb0"}
+          ],
+          "value": "#dddddd"
+        },
+        "strokeWidth": {"condition": {"test": "datum.Code == 'AUS'", "value": 3}, "value": 2},
+        "order": {"field": "Year"}
+      }
+    },
+    {
+      "params": [{"name": "pick", "select": {"type": "point", "fields": ["Code"], "on": "pointerover", "clear": "pointerout"}}],
+      "mark": {"type": "circle", "size": 110, "opacity": 1, "stroke": "#faf6ee", "strokeWidth": 1.5},
+      "encoding": {
+        "color": {
+          "condition": [
+            {"test": "datum.Code == 'AUS'", "value": "#e8590c"},
+            {"param": "pick", "empty": false, "value": "#2f6fb0"}
+          ],
+          "value": "#cccccc"
+        },
+        "tooltip": [
+          {"field": "Name", "title": "Market"},
+          {"field": "Year", "title": "Year"},
+          {"field": "ReturnLabel", "title": "Index change"},
+          {"field": "Rank", "title": "Rank"}
+        ]
+      }
+    },
+    {
+      "transform": [{"filter": "datum.Year == 2016"}],
+      "mark": {"type": "text", "align": "left", "dx": 12, "fontSize": 11},
+      "encoding": {
+        "text": {"field": "Name"},
+        "color": {"condition": {"test": "datum.Code == 'AUS'", "value": "#b8430a"}, "value": "#666666"},
+        "fontWeight": {"condition": {"test": "datum.Code == 'AUS'", "value": 700}, "value": 400}
+      }
+    },
+    {
+      "transform": [{"filter": "datum.Code == 'AUS' && datum.Year == 2010"}],
+      "mark": {"type": "text", "baseline": "top", "dy": 10, "fontSize": 11, "fontWeight": 600, "color": "#b8430a"},
+      "encoding": {"text": {"value": "Last in 2010"}}
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "padding": {"left": 5, "top": 5, "bottom": 5, "right": 95},
+    "axis": {"labelFontSize": 11, "titleFontSize": 11, "labelColor": "#666", "titleColor": "#666", "grid": false}
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": {"step": 20},
+  "data": {"url": "data/share-price-index.csv", "format": {"type": "csv", "parse": {"Index": "number"}}},
+  "transform": [
+    {"filter": "datum.Month >= '2007-01'"},
+    {"calculate": "toNumber(substring(datum.Month, 0, 4)) * 12 + toNumber(substring(datum.Month, 5, 7)) - 1", "as": "T"},
+    {"calculate": "datum.T <= 2008 * 12 + 5 ? datum.Index : null", "as": "PeakCand"},
+    {"joinaggregate": [{"op": "max", "field": "PeakCand", "as": "Peak"}, {"op": "max", "field": "T", "as": "EndT"}], "groupby": ["Code"]},
+    {"calculate": "datum.T <= 2008 * 12 + 5 && datum.Index == datum.Peak ? datum.T : null", "as": "PeakTCand"},
+    {"joinaggregate": [{"op": "min", "field": "PeakTCand", "as": "PeakT"}], "groupby": ["Code"]},
+    {"calculate": "datum.T > datum.PeakT && datum.T <= 2012 * 12 + 11 ? datum.Index : null", "as": "TroughCand"},
+    {"joinaggregate": [{"op": "min", "field": "TroughCand", "as": "Trough"}], "groupby": ["Code"]},
+    {"calculate": "datum.T > datum.PeakT && datum.T <= 2012 * 12 + 11 && datum.Index == datum.Trough ? datum.T : null", "as": "TroughTCand"},
+    {"joinaggregate": [{"op": "min", "field": "TroughTCand", "as": "TroughT"}], "groupby": ["Code"]},
+    {"calculate": "datum.T > datum.TroughT && datum.Index >= datum.Peak ? datum.T : null", "as": "RecTCand"},
+    {"joinaggregate": [{"op": "min", "field": "RecTCand", "as": "RecT"}], "groupby": ["Code"]},
+    {"filter": "datum.T == datum.PeakT"},
+    {"calculate": "isValid(datum.RecT)", "as": "Recovered"},
+    {"calculate": "datum.Recovered ? datum.RecT : datum.EndT", "as": "EndBarT"},
+    {"calculate": "datetime(floor(datum.PeakT / 12), datum.PeakT % 12, 1)", "as": "PeakDate"},
+    {"calculate": "datetime(floor(datum.TroughT / 12), datum.TroughT % 12, 1)", "as": "TroughDate"},
+    {"calculate": "datetime(floor(datum.EndBarT / 12), datum.EndBarT % 12, 1)", "as": "EndDate"},
+    {"calculate": "(datum.Recovered ? datum.RecT : 99999) - datum.PeakT", "as": "SortKey"},
+    {"calculate": "format(datum.Trough / datum.Peak - 1, '.0%')", "as": "Fall"},
+    {
+      "calculate": "datum.Recovered ? format((datum.RecT - datum.PeakT) / 12, '.1f') + ' years' : 'Not back by ' + timeFormat(datum.EndDate, '%b %Y')",
+      "as": "RecoveryLabel"
+    },
+    {
+      "lookup": "Code",
+      "from": {"data": {"url": "data/countries.csv"}, "key": "Code", "fields": ["Name"]}
+    }
+  ],
+  "encoding": {
+    "y": {
+      "field": "Name",
+      "type": "nominal",
+      "sort": {"field": "SortKey", "op": "min"},
+      "axis": {
+        "title": null,
+        "ticks": false,
+        "domain": false,
+        "labelFontWeight": {"expr": "datum.label == 'Australia' ? 700 : 400"},
+        "labelColor": {"expr": "datum.label == 'Australia' ? '#b8430a' : '#555555'"}
+      }
+    },
+    "tooltip": [
+      {"field": "Name", "title": "Market"},
+      {"field": "PeakDate", "type": "temporal", "timeUnit": "yearmonth", "title": "Pre-crisis peak"},
+      {"field": "TroughDate", "type": "temporal", "timeUnit": "yearmonth", "title": "Lowest point"},
+      {"field": "Fall", "title": "Fall from peak"},
+      {"field": "RecoveryLabel", "title": "Time to recover"}
+    ]
+  },
+  "layer": [
+    {
+      "mark": {"type": "bar", "height": 9, "color": "#c8423b"},
+      "encoding": {
+        "x": {
+          "field": "PeakDate",
+          "type": "temporal",
+          "scale": {"domain": [{"year": 2007, "month": 1}, {"year": 2027, "month": 1}]},
+          "axis": {"title": null, "format": "%Y", "tickCount": 10, "gridColor": "#f0f0f0", "domain": false}
+        },
+        "x2": {"field": "TroughDate"}
+      }
+    },
+    {
+      "mark": {"type": "bar", "height": 9},
+      "encoding": {
+        "x": {"field": "TroughDate", "type": "temporal"},
+        "x2": {"field": "EndDate"},
+        "color": {
+          "condition": {"test": "datum.Code == 'AUS'", "value": "#e8590c"},
+          "value": "#9fb8d4"
+        },
+        "opacity": {"condition": {"test": "datum.Recovered", "value": 1}, "value": 0.35}
+      }
+    },
+    {
+      "mark": {"type": "text", "align": "left", "dx": 6, "fontSize": 10.5},
+      "encoding": {
+        "x": {"field": "EndDate", "type": "temporal"},
+        "text": {"field": "RecoveryLabel"},
+        "color": {"condition": {"test": "datum.Code == 'AUS'", "value": "#b8430a"}, "value": "#777777"}
+      }
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "padding": {"left": 5, "top": 5, "bottom": 5, "right": 110},
+    "axis": {"labelFontSize": 11, "labelColor": "#666"}
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 150,
+  "data": {"url": "data/market-cap-by-country.csv", "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_GDP_Pct": "number", "MarketCap_Billion_USD": "number", "Code_Numeric": "number"}}},
+  "transform": [
+    {"filter": "datum.Year <= 2024"},
+    {
+      "window": [
+        {"op": "lag", "field": "MarketCap_Billion_USD", "as": "PrevCap"},
+        {"op": "lag", "field": "Year", "as": "PrevYear"}
+      ],
+      "groupby": ["Code"],
+      "sort": [{"field": "Year", "order": "ascending"}]
+    },
+    {"filter": "datum.PrevYear == datum.Year - 1 && datum.PrevCap > 0"},
+    {"calculate": "datum.MarketCap_Billion_USD < datum.PrevCap ? 1 : 0", "as": "Fell"},
+    {
+      "aggregate": [
+        {"op": "sum", "field": "Fell", "as": "Falling"},
+        {"op": "count", "as": "Markets"}
+      ],
+      "groupby": ["Year"]
+    },
+    {"calculate": "datum.Falling / datum.Markets", "as": "Share"},
+    {"calculate": "datum.Falling + ' of ' + datum.Markets + ' markets shrank'", "as": "Label"}
+  ],
+  "layer": [
+    {
+      "mark": {"type": "bar", "cornerRadiusTopLeft": 2, "cornerRadiusTopRight": 2},
+      "encoding": {
+        "x": {
+          "field": "Year",
+          "type": "ordinal",
+          "scale": {"domain": {"expr": "sequence(1991, 2025)"}, "paddingInner": 0.15},
+          "axis": {"title": null, "labels": false, "ticks": false, "domain": false}
+        },
+        "y": {
+          "field": "Share",
+          "type": "quantitative",
+          "scale": {"domain": [0, 1]},
+          "axis": {"title": null, "format": ".0%", "values": [0, 0.5, 1], "gridColor": "#efefef", "domain": false, "ticks": false, "minExtent": 110, "maxExtent": 110}
+        },
+        "color": {
+          "condition": {"test": "datum.Share > 0.5", "value": "#c8423b"},
+          "value": "#d6d6d6"
+        },
+        "tooltip": [
+          {"field": "Year", "title": "Year"},
+          {"field": "Label", "title": "Result"},
+          {"field": "Share", "title": "Share", "format": ".0%"}
+        ]
+      }
+    },
+    {
+      "data": {"values": [{"y": 0.5}]},
+      "mark": {"type": "rule", "color": "#999999", "strokeDash": [3, 3]},
+      "encoding": {"y": {"field": "y", "type": "quantitative"}}
+    },
+    {
+      "transform": [{"filter": "datum.Year == 2008"}],
+      "mark": {"type": "text", "align": "left", "dx": 10, "dy": 4, "baseline": "top", "fontSize": 11, "fontWeight": 600, "color": "#8f2c27"},
+      "encoding": {
+        "x": {"field": "Year", "type": "ordinal"},
+        "y": {"field": "Share", "type": "quantitative"},
+        "text": {"value": "2008: 68 of 73 markets shrank"}
+      }
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "padding": {"left": 5, "top": 5, "bottom": 0, "right": 5},
+    "axis": {"labelFontSize": 11, "titleFontSize": 11, "labelColor": "#666", "titleColor": "#666"}
+  }
+}

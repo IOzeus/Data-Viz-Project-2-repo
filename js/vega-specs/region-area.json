@@ -1,0 +1,72 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 240,
+  "data": {
+    "url": "data/market-cap-by-country.csv",
+    "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_Billion_USD": "number"}}
+  },
+  "transform": [
+    {"filter": "datum.Year >= 1993 && datum.Year <= 2024 && datum.MarketCap_Billion_USD > 0"},
+    {
+      "lookup": "Code",
+      "from": {"data": {"url": "data/countries.csv"}, "key": "Code", "fields": ["Region"]}
+    },
+    {"filter": "isValid(datum.Region)"},
+    {
+      "aggregate": [{"op": "sum", "field": "MarketCap_Billion_USD", "as": "Total"}],
+      "groupby": ["Year", "Region"]
+    },
+    {
+      "joinaggregate": [{"op": "sum", "field": "Total", "as": "WorldTotal"}],
+      "groupby": ["Year"]
+    },
+    {"calculate": "datum.Total / datum.WorldTotal", "as": "Share"},
+    {
+      "calculate": "datum.Region == 'North America' ? 1 : datum.Region == 'Europe & Central Asia' ? 2 : datum.Region == 'Asia-Pacific' ? 3 : datum.Region == 'Latin America' ? 4 : 5",
+      "as": "RegionOrder"
+    }
+  ],
+  "mark": {"type": "area", "interpolate": "monotone"},
+  "encoding": {
+    "x": {
+      "field": "Year",
+      "type": "quantitative",
+      "axis": {"format": "d", "title": null, "tickCount": 7, "grid": false}
+    },
+    "y": {
+      "field": "Share",
+      "type": "quantitative",
+      "stack": "normalize",
+      "axis": {"title": null, "format": ".0%", "gridColor": "#ebe5d8", "tickCount": 5}
+    },
+    "color": {
+      "field": "Region",
+      "type": "nominal",
+      "scale": {
+        "domain": ["North America", "Asia-Pacific", "Europe & Central Asia", "Latin America", "Middle East & Africa"],
+        "range": ["#2f6fb0", "#e8590c", "#9ecae1", "#fdae6b", "#c7e9c0"]
+      },
+      "legend": {
+        "title": null,
+        "orient": "bottom",
+        "direction": "horizontal",
+        "columns": 3,
+        "symbolSize": 80
+      }
+    },
+    "order": {"field": "RegionOrder", "sort": "ascending"},
+    "tooltip": [
+      {"field": "Year"},
+      {"field": "Region"},
+      {"field": "Share", "title": "Share of world market", "format": ".1%"},
+      {"field": "Total", "title": "Value (US$ billion)", "format": ",.0f"}
+    ]
+  },
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "axis": {"labelFontSize": 11, "labelColor": "#666"},
+    "legend": {"labelFontSize": 11, "labelColor": "#555"}
+  }
+}

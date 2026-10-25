@@ -1,0 +1,139 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {"url": "data/market-cap-by-country.csv", "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_Billion_USD": "number"}}},
+  "transform": [
+    {"filter": "datum.Year <= 2024"},
+    {
+      "window": [
+        {"op": "lag", "field": "MarketCap_Billion_USD", "as": "PrevCap"},
+        {"op": "lag", "field": "Year", "as": "PrevYear"}
+      ],
+      "groupby": ["Code"],
+      "sort": [{"field": "Year"}]
+    },
+    {"filter": "datum.PrevYear == datum.Year - 1 && datum.PrevCap > 0"},
+    {"calculate": "(datum.MarketCap_Billion_USD / datum.PrevCap - 1) * 100", "as": "Change"}
+  ],
+  "spacing": 6,
+  "vconcat": [
+    {
+      "width": 610,
+      "height": 130,
+      "transform": [
+        {"calculate": "datum.Change < 0 ? 1 : 0", "as": "Fell"},
+        {"aggregate": [{"op": "sum", "field": "Fell", "as": "Falling"}, {"op": "count", "as": "Markets"}], "groupby": ["Year"]},
+        {"calculate": "datum.Falling / datum.Markets", "as": "Share"},
+        {"calculate": "datum.Year + ': ' + datum.Falling + ' of ' + datum.Markets + ' markets shrank'", "as": "Label"}
+      ],
+      "encoding": {
+        "x": {
+          "field": "Year",
+          "type": "ordinal",
+          "scale": {"domain": {"expr": "sequence(1991, 2025)"}, "paddingInner": 0.15},
+          "axis": {"title": null, "labels": false, "ticks": false, "domain": false}
+        },
+        "y": {
+          "field": "Share",
+          "type": "quantitative",
+          "scale": {"domain": [0, 1]},
+          "axis": {"title": null, "format": ".0%", "values": [0, 0.5, 1], "gridColor": "#ebe5d8", "domain": false, "ticks": false, "minExtent": 110, "maxExtent": 110}
+        }
+      },
+      "layer": [
+        {
+          "params": [
+            {
+              "name": "pickYear",
+              "select": {"type": "point", "fields": ["Year"], "on": "click", "clear": "dblclick"},
+              "value": [{"Year": 2008}]
+            }
+          ],
+          "mark": {"type": "bar", "cornerRadiusTopLeft": 2, "cornerRadiusTopRight": 2, "cursor": "pointer"},
+          "encoding": {
+            "color": {"condition": {"test": "datum.Share > 0.5", "value": "#c8423b"}, "value": "#cfc8b8"},
+            "opacity": {"condition": {"param": "pickYear", "value": 1}, "value": 0.35},
+            "tooltip": [{"field": "Label", "title": "Year"}]
+          }
+        },
+        {
+          "data": {"values": [{"y": 0.5}]},
+          "mark": {"type": "rule", "color": "#999999", "strokeDash": [3, 3]},
+          "encoding": {"x": null, "y": {"field": "y", "type": "quantitative"}}
+        },
+        {
+          "transform": [{"filter": {"param": "pickYear", "empty": false}}],
+          "mark": {
+            "type": "text",
+            "baseline": "bottom",
+            "dy": -4,
+            "fontSize": 11.5,
+            "fontWeight": 700,
+            "color": "#222222",
+            "align": {"expr": "datum.Year > 2012 ? 'right' : 'left'"}
+          },
+          "encoding": {"text": {"field": "Label"}}
+        }
+      ]
+    },
+    {
+      "width": 610,
+      "height": {"step": 16},
+      "transform": [
+        {
+          "calculate": "indexof(['AUS','NZL','USA','CAN','BRA','MEX','GBR','FRA','DEU','CHE','ESP','CHN','JPN','IND','HKG','KOR','SGP','MYS','IDN','THA','SAU','ZAF'], datum.Code)",
+          "as": "Order"
+        },
+        {"filter": "datum.Order >= 0"},
+        {"lookup": "Code", "from": {"data": {"url": "data/countries.csv"}, "key": "Code", "fields": ["Name"]}},
+        {"calculate": "(datum.Change > 0 ? '+' : '') + format(datum.Change, '.0f') + '%'", "as": "ChangeLabel"}
+      ],
+      "mark": {"type": "rect", "stroke": "#faf6ee", "strokeWidth": 1},
+      "encoding": {
+        "x": {
+          "field": "Year",
+          "type": "ordinal",
+          "scale": {"domain": {"expr": "sequence(1991, 2025)"}, "paddingInner": 0},
+          "axis": {"title": null, "labelAngle": 0, "labelExpr": "datum.value % 5 == 0 ? datum.value : ''", "ticks": false, "domain": false}
+        },
+        "y": {
+          "field": "Name",
+          "type": "nominal",
+          "sort": {"field": "Order", "op": "min"},
+          "axis": {
+            "title": null,
+            "ticks": false,
+            "domain": false,
+            "minExtent": 110,
+            "maxExtent": 110,
+            "labelFontWeight": {"expr": "datum.label == 'Australia' ? 700 : 400"},
+            "labelColor": {"expr": "datum.label == 'Australia' ? '#b8430a' : '#555555'"}
+          }
+        },
+        "color": {
+          "field": "Change",
+          "type": "quantitative",
+          "scale": {"scheme": "redblue", "domain": [-60, 0, 60], "clamp": true},
+          "legend": {
+            "title": "Change on previous year (US$)",
+            "orient": "bottom",
+            "direction": "horizontal",
+            "gradientLength": 240,
+            "labelExpr": "(datum.value > 0 ? '+' : '') + datum.value + '%'"
+          }
+        },
+        "opacity": {"condition": {"param": "pickYear", "value": 1}, "value": 0.25},
+        "tooltip": [
+          {"field": "Name", "title": "Country"},
+          {"field": "Year", "title": "Year"},
+          {"field": "ChangeLabel", "title": "Change in US$ value"}
+        ]
+      }
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "axis": {"labelFontSize": 11, "labelColor": "#666"},
+    "legend": {"titleFontSize": 11, "labelFontSize": 11, "titleColor": "#555", "labelColor": "#555"}
+  }
+}

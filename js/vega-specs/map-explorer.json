@@ -1,0 +1,195 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "params": [
+    {
+      "name": "year",
+      "value": 2024,
+      "bind": {"input": "range", "min": 1990, "max": 2024, "step": 1, "name": "Map year "}
+    }
+  ],
+  "spacing": 36,
+  "hconcat": [
+    {
+      "width": 520,
+      "height": 320,
+      "projection": {"type": "equalEarth"},
+      "layer": [
+        {
+          "data": {"sphere": true},
+          "mark": {"type": "geoshape", "fill": "#f3eee2", "stroke": "#e2dccd", "strokeWidth": 0.75}
+        },
+        {
+          "data": {
+            "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2/data/world-110m.json",
+            "format": {"type": "topojson", "feature": "countries"}
+          },
+          "mark": {"type": "geoshape", "fill": "#ddd6c5", "stroke": "#faf6ee", "strokeWidth": 0.5}
+        },
+        {
+          "data": {"url": "data/market-cap-by-country.csv", "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_GDP_Pct": "number", "MarketCap_Billion_USD": "number", "Code_Numeric": "number"}}},
+          "transform": [
+            {"filter": "datum.Year == year && datum.Code_Numeric > 0"},
+            {
+              "lookup": "Code_Numeric",
+              "from": {
+                "data": {
+                  "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2/data/world-110m.json",
+                  "format": {"type": "topojson", "feature": "countries"}
+                },
+                "key": "id"
+              },
+              "as": "geo"
+            },
+            {"filter": "isValid(datum.geo)"},
+            {"lookup": "Code", "from": {"data": {"url": "data/countries.csv"}, "key": "Code", "fields": ["Name"]}},
+            {"calculate": "format(datum.MarketCap_GDP_Pct, ',.0f') + '%'", "as": "PctLabel"},
+            {
+              "calculate": "datum.MarketCap_GDP_Pct < 25 ? 'Under 25%' : datum.MarketCap_GDP_Pct < 50 ? '25–50%' : datum.MarketCap_GDP_Pct < 100 ? '50–100%' : datum.MarketCap_GDP_Pct < 200 ? '100–200%' : 'Over 200%'",
+              "as": "Band"
+            }
+          ],
+          "params": [
+            {
+              "name": "pick",
+              "select": {"type": "point", "fields": ["Code"], "on": "click", "clear": false},
+              "value": [{"Code": "USA"}]
+            }
+          ],
+          "mark": {"type": "geoshape", "cursor": "pointer"},
+          "encoding": {
+            "shape": {"field": "geo", "type": "geojson"},
+            "color": {
+              "field": "Band",
+              "type": "ordinal",
+              "scale": {
+                "domain": ["Under 25%", "25–50%", "50–100%", "100–200%", "Over 200%"],
+                "range": ["#deebf7", "#9ecae1", "#5a9bd0", "#2a6cb0", "#0b3d7a"]
+              },
+              "legend": {
+                "title": "Stock market value as % of GDP",
+                "orient": "bottom-left",
+                "symbolType": "square",
+                "symbolSize": 120,
+                "symbolStrokeWidth": 0
+              }
+            },
+            "stroke": {
+              "condition": [
+                {"test": "datum.Code == 'AUS'", "value": "#e8590c"},
+                {"param": "pick", "empty": false, "value": "#111111"}
+              ],
+              "value": "#faf6ee"
+            },
+            "strokeWidth": {
+              "condition": [
+                {"test": "datum.Code == 'AUS'", "value": 2},
+                {"param": "pick", "empty": false, "value": 2}
+              ],
+              "value": 0.5
+            },
+            "tooltip": [
+              {"field": "Name", "title": "Country"},
+              {"field": "Year", "title": "Year"},
+              {"field": "PctLabel", "title": "Market as % of GDP"}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "width": 380,
+      "height": 320,
+      "layer": [
+        {
+          "data": {
+            "values": [
+              {"Year": 2000, "Event": "Dot-com"},
+              {"Year": 2008, "Event": "GFC"},
+              {"Year": 2020, "Event": "COVID"}
+            ]
+          },
+          "encoding": {"x": {"field": "Year", "type": "quantitative", "scale": {"domain": [1990, 2024]}}},
+          "layer": [
+            {"mark": {"type": "rule", "color": "#c9c2b2", "strokeDash": [3, 3]}},
+            {
+              "mark": {"type": "text", "align": "left", "dx": 4, "y": 4, "baseline": "top", "fontSize": 10, "color": "#999"},
+              "encoding": {"text": {"field": "Event"}}
+            }
+          ]
+        },
+        {
+          "data": {"values": [{}]},
+          "transform": [{"calculate": "year", "as": "Year"}],
+          "mark": {"type": "rule", "color": "#111111", "strokeWidth": 1},
+          "encoding": {"x": {"field": "Year", "type": "quantitative", "scale": {"domain": [1990, 2024]}}}
+        },
+        {
+          "data": {"url": "data/market-cap-by-country.csv", "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_GDP_Pct": "number"}}},
+          "transform": [
+            {"filter": "datum.Year <= 2024"},
+            {"filter": "datum.Code == 'AUS' || vlSelectionTest('pick_store', datum)"},
+            {"lookup": "Code", "from": {"data": {"url": "data/countries.csv"}, "key": "Code", "fields": ["Name"]}},
+            {"calculate": "format(datum.MarketCap_GDP_Pct, ',.0f') + '%'", "as": "PctLabel"},
+            {"joinaggregate": [{"op": "max", "field": "Year", "as": "LastYear"}], "groupby": ["Code"]}
+          ],
+          "encoding": {
+            "x": {
+              "field": "Year",
+              "type": "quantitative",
+              "scale": {"domain": [1990, 2024]},
+              "axis": {"format": "d", "title": null, "tickCount": 6, "grid": false}
+            },
+            "y": {
+              "field": "MarketCap_GDP_Pct",
+              "type": "quantitative",
+              "scale": {"domain": [0, 300], "clamp": true},
+              "axis": {"title": "% of GDP", "labelExpr": "datum.value + '%'", "gridColor": "#ebe5d8", "tickCount": 6}
+            },
+            "color": {
+              "condition": {"test": "datum.Code == 'AUS'", "value": "#e8590c"},
+              "value": "#2f6fb0"
+            }
+          },
+          "layer": [
+            {
+              "mark": {"type": "line", "interpolate": "monotone", "strokeWidth": 2.5},
+              "encoding": {"detail": {"field": "Code"}}
+            },
+            {
+              "mark": {"type": "circle", "size": 40, "opacity": 0},
+              "encoding": {
+                "tooltip": [
+                  {"field": "Name", "title": "Country"},
+                  {"field": "Year", "title": "Year"},
+                  {"field": "PctLabel", "title": "Market as % of GDP"}
+                ]
+              }
+            },
+            {
+              "transform": [{"filter": "datum.Year == datum.LastYear"}],
+              "mark": {"type": "text", "align": "left", "dx": 6, "fontSize": 11, "fontWeight": 700},
+              "encoding": {"text": {"field": "Name"}}
+            },
+            {
+              "transform": [
+                {"filter": "datum.Code == 'AUS' && (datum.Year == 2007 || datum.Year == 2008)"},
+                {"calculate": "datum.Year == 2007 ? '2007 peak ' + datum.PctLabel : 'GFC low ' + datum.PctLabel", "as": "Note"}
+              ],
+              "layer": [
+                {"mark": {"type": "circle", "size": 45, "opacity": 1, "stroke": "#faf6ee", "strokeWidth": 1.5}},
+                {"mark": {"type": "text", "align": "right", "dx": -7, "fontSize": 10.5, "fontWeight": 600}, "encoding": {"text": {"field": "Note"}}}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "padding": {"left": 5, "top": 5, "bottom": 5, "right": 90},
+    "axis": {"labelFontSize": 11, "titleFontSize": 11, "labelColor": "#666", "titleColor": "#666", "domainColor": "#ccc", "tickColor": "#ccc"},
+    "legend": {"titleFontSize": 11, "labelFontSize": 11, "titleColor": "#555", "labelColor": "#555"}
+  }
+}

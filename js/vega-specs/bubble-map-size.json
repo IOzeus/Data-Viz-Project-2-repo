@@ -1,0 +1,140 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 430,
+  "params": [
+    {
+      "name": "year",
+      "value": 2024,
+      "bind": {"input": "range", "min": 1990, "max": 2024, "step": 1, "name": "Year "}
+    }
+  ],
+  "projection": {"type": "equalEarth"},
+  "layer": [
+    {
+      "data": {"sphere": true},
+      "mark": {"type": "geoshape", "fill": "#f3eee2", "stroke": "#e2dccd", "strokeWidth": 0.75}
+    },
+    {
+      "data": {
+        "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2/data/world-110m.json",
+        "format": {"type": "topojson", "feature": "countries"}
+      },
+      "mark": {"type": "geoshape", "fill": "#e3dccb", "stroke": "#faf6ee", "strokeWidth": 0.5}
+    },
+    {
+      "data": {"url": "data/market-cap-by-country.csv", "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_GDP_Pct": "number", "MarketCap_Billion_USD": "number", "Code_Numeric": "number"}}},
+      "transform": [
+        {"filter": "datum.Year == year"},
+        {
+          "lookup": "Code",
+          "from": {
+            "data": {"url": "data/countries.csv", "format": {"type": "csv", "parse": {"Lon": "number", "Lat": "number"}}},
+            "key": "Code",
+            "fields": ["Name", "Region", "Lon", "Lat"]
+          }
+        },
+        {"filter": "isValid(datum.Lon)"},
+        {"calculate": "datum.MarketCap_Billion_USD / datum.MarketCap_GDP_Pct * 100", "as": "GDP_B"},
+        {
+          "calculate": "datum.MarketCap_Billion_USD >= 1000 ? '$' + format(datum.MarketCap_Billion_USD / 1000, '.2f') + ' trillion' : '$' + format(datum.MarketCap_Billion_USD, datum.MarketCap_Billion_USD < 10 ? '.1f' : ',.0f') + ' billion'",
+          "as": "CapLabel"
+        },
+        {
+          "calculate": "datum.GDP_B >= 1000 ? '$' + format(datum.GDP_B / 1000, '.2f') + ' trillion' : '$' + format(datum.GDP_B, datum.GDP_B < 10 ? '.1f' : ',.0f') + ' billion'",
+          "as": "GdpLabel"
+        },
+        {"calculate": "format(datum.MarketCap_GDP_Pct, ',.0f') + '%'", "as": "PctLabel"},
+        {"calculate": "datum.Code == 'AUS'", "as": "IsAustralia"}
+      ],
+      "encoding": {
+        "longitude": {"field": "Lon", "type": "quantitative"},
+        "latitude": {"field": "Lat", "type": "quantitative"},
+        "tooltip": [
+          {"field": "Name", "title": "Country"},
+          {"field": "Year", "title": "Year"},
+          {"field": "CapLabel", "title": "Stock market value"},
+          {"field": "GdpLabel", "title": "Economy (GDP)"},
+          {"field": "PctLabel", "title": "Market as % of GDP"}
+        ]
+      },
+      "layer": [
+        {
+          "mark": {"type": "point", "shape": "circle", "filled": false, "stroke": "#8a8a8a", "strokeWidth": 1.2},
+          "encoding": {
+            "size": {
+              "field": "GDP_B",
+              "type": "quantitative",
+              "scale": {"domain": [0, 65000], "range": [0, 5200]},
+              "legend": {
+                "title": "Circle area (US$)",
+                "orient": "bottom-left",
+                "values": [1000, 10000, 30000],
+                "labelExpr": "'$' + format(datum.value / 1000, ',.0f') + 'T'",
+                "symbolFillColor": "transparent",
+                "symbolStrokeColor": "#8a8a8a",
+                "symbolStrokeWidth": 1
+              }
+            },
+            "order": {"field": "GDP_B", "sort": "descending"}
+          }
+        },
+        {
+          "mark": {"type": "circle", "opacity": 0.7, "stroke": "#faf6ee", "strokeWidth": 0.75},
+          "encoding": {
+            "size": {
+              "field": "MarketCap_Billion_USD",
+              "type": "quantitative",
+              "scale": {"domain": [0, 65000], "range": [0, 5200]},
+              "legend": {
+                "title": "Circle area (US$)",
+                "orient": "bottom-left",
+                "values": [1000, 10000, 30000],
+                "labelExpr": "'$' + format(datum.value / 1000, ',.0f') + 'T'",
+                "symbolFillColor": "transparent",
+                "symbolStrokeColor": "#8a8a8a",
+                "symbolStrokeWidth": 1
+              }
+            },
+            "color": {
+              "condition": {"test": "datum.Code == 'AUS'", "value": "#e8590c"},
+              "value": "#2f6fb0"
+            },
+            "order": {"field": "MarketCap_Billion_USD", "sort": "descending"}
+          }
+        },
+        {
+          "transform": [
+            {"filter": "datum.MarketCap_Billion_USD >= 20000"},
+            {"calculate": "split(datum.Name, ' ')", "as": "NameLines"}
+          ],
+          "mark": {"type": "text", "fontSize": 12, "fontWeight": 700, "color": "#ffffff"},
+          "encoding": {"text": {"field": "NameLines"}}
+        },
+        {
+          "transform": [
+            {"filter": "((datum.MarketCap_Billion_USD >= 2500 && datum.MarketCap_Billion_USD < 20000) || datum.Code == 'AUS') && datum.Code != 'HKG'"}
+          ],
+          "mark": {"type": "text", "fontSize": 11, "fontWeight": 600, "baseline": "bottom", "dy": -14},
+          "encoding": {
+            "text": {"field": "Name"},
+            "color": {"condition": {"test": "datum.Code == 'AUS'", "value": "#b8430a"}, "value": "#333333"}
+          }
+        },
+        {
+          "transform": [
+            {"filter": "datum.Code == 'HKG' && datum.MarketCap_Billion_USD >= 500"},
+            {"calculate": "['Hong Kong', 'market worth ' + format(datum.MarketCap_GDP_Pct / 100, '.0f') + '× its GDP']", "as": "Label"}
+          ],
+          "mark": {"type": "text", "fontSize": 11, "align": "left", "dx": 14, "dy": 4, "baseline": "top", "lineHeight": 13},
+          "encoding": {"text": {"field": "Label"}, "color": {"value": "#333333"}}
+        }
+      ]
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "legend": {"titleFontSize": 11, "labelFontSize": 11, "titleColor": "#555", "labelColor": "#555"}
+  }
+}

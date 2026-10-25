@@ -1,0 +1,104 @@
+Code,Name,Region,Lon,Lat
+DZA,Algeria,Middle East & Africa,2.61,28.09
+ARG,Argentina,Latin America,-64.74,-34.57
+ARM,Armenia,Europe & Central Asia,45.01,40.21
+AUS,Australia,Asia-Pacific,134.23,-25.62
+AUT,Austria,Europe & Central Asia,14.06,47.62
+AZE,Azerbaijan,Europe & Central Asia,47.69,40.28
+BHR,Bahrain,Middle East & Africa,50.56,26.07
+BGD,Bangladesh,Asia-Pacific,90.28,23.83
+BRB,Barbados,Latin America,-59.54,13.19
+BLR,Belarus,Europe & Central Asia,27.96,53.50
+BEL,Belgium,Europe & Central Asia,4.59,50.65
+BMU,Bermuda,North America,-64.75,32.31
+BWA,Botswana,Middle East & Africa,23.78,-22.08
+BRA,Brazil,Latin America,-53.17,-10.66
+BGR,Bulgaria,Europe & Central Asia,25.19,42.76
+CAN,Canada,North America,-97.86,58.45
+CYM,Cayman Islands,Latin America,-81.25,19.31
+CHI,Channel Islands,Europe & Central Asia,-2.35,49.35
+CHL,Chile,Latin America,-71.24,-35.88
+CHN,China,Asia-Pacific,103.42,36.75
+COL,Colombia,Latin America,-73.07,3.92
+CRI,Costa Rica,Latin America,-84.17,9.97
+CIV,Cote d'Ivoire,Middle East & Africa,-5.61,7.55
+HRV,Croatia,Europe & Central Asia,16.57,45.01
+CYP,Cyprus,Europe & Central Asia,33.04,34.91
+CZE,Czechia,Europe & Central Asia,15.34,49.78
+DNK,Denmark,Europe & Central Asia,9.30,56.21
+ECU,Ecuador,Latin America,-78.38,-1.45
+EGY,Egypt,Middle East & Africa,29.86,26.47
+SWZ,Eswatini,Middle East & Africa,31.40,-26.49
+FIN,Finland,Europe & Central Asia,26.14,64.26
+FRA,France,Europe & Central Asia,2.35,46.56
+DEU,Germany,Europe & Central Asia,10.27,51.08
+GHA,Ghana,Middle East & Africa,-1.24,7.92
+GRC,Greece,Europe & Central Asia,22.55,39.32
+HKG,Hong Kong,Asia-Pacific,114.17,22.32
+HUN,Hungary,Europe & Central Asia,19.34,47.20
+IND,India,Asia-Pacific,79.54,22.82
+IDN,Indonesia,Asia-Pacific,114.02,-0.25
+IRN,Iran,Middle East & Africa,54.45,32.47
+IRL,Ireland,Europe & Central Asia,-8.02,53.17
+ISR,Israel,Middle East & Africa,35.00,31.48
+ITA,Italy,Europe & Central Asia,12.37,43.43
+JAM,Jamaica,Latin America,-77.32,18.14
+JPN,Japan,Asia-Pacific,136.71,36.01
+JOR,Jordan,Middle East & Africa,36.77,31.24
+KAZ,Kazakhstan,Europe & Central Asia,67.24,48.41
+KEN,Kenya,Middle East & Africa,37.79,0.60
+KOR,South Korea,Asia-Pacific,127.82,36.42
+KWT,Kuwait,Middle East & Africa,47.60,29.31
+LBN,Lebanon,Middle East & Africa,35.87,33.91
+LUX,Luxembourg,Europe & Central Asia,5.97,49.76
+MYS,Malaysia,Asia-Pacific,101.70,3.80
+MLT,Malta,Europe & Central Asia,14.38,35.94
+MUS,Mauritius,Middle East & Africa,57.55,-20.25
+MEX,Mexico,Latin America,-102.22,23.91
+MNE,Montenegro,Europe & Central Asia,19.29,42.79
+MAR,Morocco,Middle East & Africa,-8.69,29.82
+NAM,Namibia,Middle East & Africa,17.14,-22.04
+NLD,Netherlands,Europe & Central Asia,5.50,52.29
+NZL,New Zealand,Asia-Pacific,170.60,-43.96
+NGA,Nigeria,Middle East & Africa,7.99,9.54
+NOR,Norway,Europe & Central Asia,12.37,64.09
+OMN,Oman,Middle East & Africa,56.07,20.56
+PAK,Pakistan,Asia-Pacific,69.23,29.91
+PAN,Panama,Latin America,-80.11,8.53
+PNG,Papua New Guinea,Asia-Pacific,144.32,-6.64
+PRY,Paraguay,Latin America,-58.43,-23.23
+PER,Peru,Latin America,-74.43,-9.15
+PHL,Philippines,Asia-Pacific,121.55,15.74
+POL,Poland,Europe & Central Asia,19.34,52.13
+PRT,Portugal,Europe & Central Asia,-8.06,39.61
+QAT,Qatar,Middle East & Africa,51.18,25.32
+ROU,Romania,Europe & Central Asia,24.95,45.85
+RUS,Russia,Europe & Central Asia,95.32,65.79
+RWA,Rwanda,Middle East & Africa,29.92,-2.01
+SAU,Saudi Arabia,Middle East & Africa,44.64,24.09
+SRB,Serbia,Europe & Central Asia,20.84,44.22
+SYC,Seychelles,Middle East & Africa,55.45,-4.68
+SGP,Singapore,Asia-Pacific,103.82,1.35
+SVK,Slovakia,Europe & Central Asia,19.50,48.73
+SVN,Slovenia,Europe & Central Asia,14.93,46.13
+ZAF,South Africa,Middle East & Africa,25.16,-28.92
+ESP,Spain,Europe & Central Asia,-3.62,40.32
+LKA,Sri Lanka,Asia-Pacific,80.67,7.70
+SWE,Sweden,Europe & Central Asia,16.11,62.42
+CHE,Switzerland,Europe & Central Asia,8.12,46.79
+TZA,Tanzania,Middle East & Africa,34.74,-6.25
+THA,Thailand,Asia-Pacific,101.00,14.98
+TTO,Trinidad and Tobago,Latin America,-61.33,10.43
+TUN,Tunisia,Middle East & Africa,9.54,34.14
+TUR,Turkiye,Europe & Central Asia,35.37,39.06
+UKR,Ukraine,Europe & Central Asia,31.45,49.00
+ARE,United Arab Emirates,Middle East & Africa,54.20,23.87
+GBR,United Kingdom,Europe & Central Asia,-2.57,53.77
+USA,United States,North America,-98.73,39.87
+URY,Uruguay,Latin America,-56.01,-32.77
+UZB,Uzbekistan,Europe & Central Asia,63.37,41.77
+VEN,Venezuela,Latin America,-66.15,7.16
+VNM,Vietnam,Asia-Pacific,106.33,16.56
+PSE,West Bank and Gaza,Middle East & Africa,35.27,31.94
+ZMB,Zambia,Middle East & Africa,27.76,-13.39
+ZWE,Zimbabwe,Middle East & Africa,29.79,-18.90

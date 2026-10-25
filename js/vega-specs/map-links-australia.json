@@ -1,0 +1,110 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 420,
+  "projection": {"type": "equalEarth", "rotate": [-150, 0, 0]},
+  "layer": [
+    {
+      "data": {"sphere": true},
+      "mark": {"type": "geoshape", "fill": "#f3eee2", "stroke": "#e2dccd", "strokeWidth": 0.75}
+    },
+    {
+      "data": {
+        "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2/data/world-110m.json",
+        "format": {"type": "topojson", "feature": "countries"}
+      },
+      "mark": {"type": "geoshape", "fill": "#e3dccb", "stroke": "#faf6ee", "strokeWidth": 0.5}
+    },
+    {
+      "data": {"url": "data/share-price-index.csv", "format": {"type": "csv", "parse": {"Index": "number"}}},
+      "transform": [
+        {"filter": "datum.Month >= '1997-01' && datum.Month <= '2016-12'"},
+        {
+          "window": [{"op": "lag", "field": "Index", "as": "Prev"}],
+          "groupby": ["Code"],
+          "sort": [{"field": "Month"}]
+        },
+        {"filter": "isValid(datum.Prev)"},
+        {"calculate": "datum.Index > datum.Prev ? 1 : datum.Index < datum.Prev ? -1 : 0", "as": "Dir"},
+        {"calculate": "datum.Code == 'AUS' ? datum.Dir : null", "as": "AusDir"},
+        {"joinaggregate": [{"op": "max", "field": "AusDir", "as": "AusMonthDir"}], "groupby": ["Month"]},
+        {"filter": "datum.Code != 'AUS' && isValid(datum.AusMonthDir)"},
+        {"calculate": "datum.Dir == datum.AusMonthDir ? 1 : 0", "as": "Same"},
+        {"aggregate": [{"op": "mean", "field": "Same", "as": "Share"}, {"op": "count", "as": "Months"}], "groupby": ["Code"]},
+        {
+          "lookup": "Code",
+          "from": {
+            "data": {"url": "data/countries.csv", "format": {"type": "csv", "parse": {"Lon": "number", "Lat": "number"}}},
+            "key": "Code",
+            "fields": ["Name", "Lon", "Lat"]
+          }
+        },
+        {"calculate": "134.23", "as": "AusLon"},
+        {"calculate": "-25.62", "as": "AusLat"},
+        {"calculate": "format(datum.Share, '.0%') + ' of months'", "as": "ShareLabel"}
+      ],
+      "layer": [
+        {
+          "mark": {"type": "rule", "strokeCap": "round"},
+          "encoding": {
+            "longitude": {"field": "AusLon", "type": "quantitative"},
+            "latitude": {"field": "AusLat", "type": "quantitative"},
+            "longitude2": {"field": "Lon"},
+            "latitude2": {"field": "Lat"},
+            "color": {
+              "field": "Share",
+              "type": "quantitative",
+              "scale": {"domain": [0.55, 0.8], "range": ["#d4e3f2", "#0b3d7a"], "clamp": true},
+              "legend": {
+                "title": "Months in step with Australia",
+                "orient": "bottom-left",
+                "direction": "horizontal",
+                "format": ".0%",
+                "gradientLength": 200
+              }
+            },
+            "strokeWidth": {"field": "Share", "type": "quantitative", "scale": {"domain": [0.55, 0.8], "range": [0.5, 4], "clamp": true}, "legend": null},
+            "order": {"field": "Share"}
+          }
+        },
+        {
+          "mark": {"type": "circle", "size": 45, "opacity": 1, "stroke": "#faf6ee", "strokeWidth": 1},
+          "encoding": {
+            "longitude": {"field": "Lon", "type": "quantitative"},
+            "latitude": {"field": "Lat", "type": "quantitative"},
+            "color": {"field": "Share", "type": "quantitative"},
+            "tooltip": [
+              {"field": "Name", "title": "Market"},
+              {"field": "ShareLabel", "title": "Moved with Australia in"}
+            ]
+          }
+        },
+        {
+          "transform": [{"filter": "indexof(['CAN','USA','MEX','DEU','JPN','NZL','THA','BRA'], datum.Code) >= 0"}],
+          "mark": {"type": "text", "fontSize": 11, "fontWeight": 600, "baseline": "bottom", "dy": -6, "color": "#333333"},
+          "encoding": {
+            "longitude": {"field": "Lon", "type": "quantitative"},
+            "latitude": {"field": "Lat", "type": "quantitative"},
+            "text": {"field": "Name"}
+          }
+        }
+      ]
+    },
+    {
+      "data": {"values": [{"Lon": 134.23, "Lat": -25.62, "Name": "Australia"}]},
+      "layer": [
+        {"mark": {"type": "circle", "size": 110, "color": "#e8590c", "opacity": 1, "stroke": "#faf6ee", "strokeWidth": 1.5}},
+        {"mark": {"type": "text", "fontSize": 11, "fontWeight": 700, "color": "#b8430a", "baseline": "top", "dy": 9}, "encoding": {"text": {"field": "Name"}}}
+      ],
+      "encoding": {
+        "longitude": {"field": "Lon", "type": "quantitative"},
+        "latitude": {"field": "Lat", "type": "quantitative"}
+      }
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "legend": {"titleFontSize": 11, "labelFontSize": 11, "titleColor": "#555", "labelColor": "#555"}
+  }
+}

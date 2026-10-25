@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Where the World's Money Lives</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.21.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.26.0"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Progress line -->
+<div id="pg"></div>
+
+<!-- Nav -->
+<nav>
+  <div class="container nav-inner">
+    <span class="nav-title">Where the World's Money Lives</span>
+    <div class="nav-links">
+      <a id="nv1" href="#pt1">I · Size</a>
+      <a id="nv2" href="#pt2">II · Performance</a>
+      <a id="nv3" href="#pt3">III · Connections</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="container hero">
+  <p class="eyebrow">FIT3179 · Data Visualisation 2 · 2026</p>
+  <h1>Where the World's<br>Money Lives</h1>
+  <p class="hero-sub">How the world's stock markets compare in size, how they have grown, how they rise and fall together, and where Australia fits in.</p>
+
+  <div class="stats-row">
+    <div class="stat-block">
+      <div class="stat-num" style="color:#0d1b2e;">$<span data-count="113" data-suffix="T">0T</span></div>
+      <div class="stat-label">Combined market value, 70 countries, 2024</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" style="color:#1d4ed8;"><span data-count="55" data-suffix="%">0%</span></div>
+      <div class="stat-label">Held in the United States</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" style="color:#b8430a;">10th</div>
+      <div class="stat-label">Australia's rank by stock market value</div>
+    </div>
+  </div>
+
+  <nav class="chapter-nav">
+    <a href="#pt1">I — How big are the world's markets?</a>
+    <a href="#pt2">II — How have they performed?</a>
+    <a href="#pt3">III — How are markets connected?</a>
+  </nav>
+</header>
+
+<!-- ===== PART I ===== -->
+<div id="pt1" class="part-band">
+  <div class="container part-inner">
+    <span class="part-num">I</span>
+    <div>
+      <div class="part-title">How big are the world's markets?</div>
+      <p class="part-intro">Stock markets range from a few billion dollars to more than $60 trillion. We start with size: in dollars, against each economy, and how that has changed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 01 -->
+<div class="rv container section">
+  <div class="sec-grid">
+    <div class="col-t">
+      <p class="sec-label">01 · Market size</p>
+      <h2>Some markets dwarf their own economies</h2>
+      <p class="body-text">A country's <strong>stock market value</strong> is the combined price of every share listed on its exchanges. Comparing it with the size of the economy (GDP) shows how much of a country's wealth is held in shares.</p>
+      <p class="body-text">The <span class="usa">United States</span> alone holds $62 trillion, more than half the total. Hong Kong's market is worth 11 times its economy because companies from across Asia list there.</p>
+      <div class="key-fig">
+        <div class="kf-num">$1.7T</div>
+        <div class="kf-label">The value of <span class="aus">Australia's</span> market, almost exactly the size of its economy</div>
+      </div>
+      <div class="legend">
+        <span class="dot dot-blue"></span>Stock market value
+        <span class="dot dot-ring"></span>Economy (GDP)
+        <span class="dot dot-aus"></span>Australia
+      </div>
+      <p class="annotation"><strong>Where the filled circle spills past the ring</strong>, the market is worth more than the economy. Drag the year slider to watch markets grow from 1990.</p>
+    </div>
+    <div class="col-c">
+      <div id="bubble-map-size" class="viz viz-lg"></div>
+      <p class="caption">Stock market value of listed domestic companies, current US$. GDP derived from the World Bank's market-value-to-GDP series. Source: World Bank.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 02 -->
+<div class="rv container section divider">
+  <div class="sec-grid sec-grid-rev">
+    <div class="col-c">
+      <div id="choropleth-market-cap" class="viz viz-lg"></div>
+      <p class="caption">Market value of listed domestic companies as % of GDP. Source: World Bank.</p>
+    </div>
+    <div class="col-t">
+      <p class="sec-label">02 · Relative size</p>
+      <h2>Australia sits in the middle of the pack</h2>
+      <p class="body-text">Measured against each economy, <span class="aus">Australia's</span> market is worth 99% of GDP. The darkest countries, including South Africa, Saudi Arabia, the United States and Switzerland, have markets worth more than twice their GDP.</p>
+      <p class="body-text">Germany is a contrast: it is the world's third-largest economy, but its share market is worth only 44% of GDP.</p>
+      <div class="key-fig">
+        <div class="kf-num">12th of 70</div>
+        <div class="kf-label"><span class="aus">Australia's</span> rank when markets are measured against GDP</div>
+      </div>
+      <p class="annotation"><strong>Australia is outlined in orange.</strong> Grey countries have no World Bank figure for the selected year.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 03 -->
+<div class="rv container section divider">
+  <div class="sec-grid">
+    <div class="col-t">
+      <p class="sec-label">03 · Growth over time</p>
+      <h2>The US pulled away after the GFC. Australia didn't.</h2>
+      <p class="body-text">In 2007 <span class="aus">Australia's</span> market was worth more relative to its economy than the United States'. The Global Financial Crisis more than halved it in a single year.</p>
+      <p class="body-text">Since then Australia has moved between about 85% and 130%, while the US has climbed to 212%, driven largely by its technology giants.</p>
+      <div class="key-fig">
+        <div class="kf-num">152%→65%</div>
+        <div class="kf-label"><span class="aus">Australia's</span> market as a share of GDP, 2007 to 2008</div>
+      </div>
+      <p class="annotation"><strong>Hover</strong> a line to identify the country. Values above 250% are capped at the top of the chart.</p>
+    </div>
+    <div class="col-c">
+      <div id="line-trend" class="viz"></div>
+      <p class="caption">Market value of listed domestic companies as % of GDP, 1990–2024. Source: World Bank.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 04 -->
+<div class="rv container section divider">
+  <div class="sec-grid sec-grid-rev">
+    <div class="col-c">
+      <div id="dumbbell-change" class="viz viz-tall"></div>
+      <p class="caption">Market value of listed domestic companies as % of GDP, 2004 and 2024. Source: World Bank.</p>
+    </div>
+    <div class="col-t">
+      <p class="sec-label">04 · Australia vs the world</p>
+      <h2>Twenty years on, most markets outgrew their economies</h2>
+      <p class="body-text">Each line joins a country's 2004 value (grey) to its 2024 value (blue). Markets in the US, Japan and India roughly doubled relative to their economies.</p>
+      <p class="body-text"><span class="aus">Australia</span> went the other way. It is one of ten markets in this chart that shrank relative to the economy.</p>
+      <div class="key-fig">
+        <div class="kf-num">126%→99%</div>
+        <div class="kf-label"><span class="aus">Australia's</span> market as a share of GDP, 2004 to 2024</div>
+      </div>
+      <p class="annotation">Includes every market worth more than US$100 billion in 2024 with data for both years. <strong>Hong Kong</strong> (509%→1,114%) is left out so it doesn't squash the scale.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 05 -->
+<div class="rv container section divider">
+  <div class="sec-grid">
+    <div class="col-t">
+      <p class="sec-label">05 · Regional shifts</p>
+      <h2>North America still leads, but Asia is catching up fast</h2>
+      <p class="body-text">In 1993, <span class="usa">North America</span> held about 38% of global stock market value. By 2024 its share has grown further, but <span class="aus">Asia-Pacific</span> has nearly doubled its slice — from roughly 22% to 35% — driven by China, India, and Australia.</p>
+      <p class="body-text">Meanwhile Europe's share has more than halved, squeezed by slow growth and a decade of negative interest rates.</p>
+      <div class="key-fig key-fig-blue">
+        <div class="kf-num">+13 pp</div>
+        <div class="kf-label">Asia-Pacific's gain in global market share since 1993</div>
+      </div>
+      <p class="annotation"><strong>Hover</strong> a band for the region's exact share and dollar value in each year.</p>
+    </div>
+    <div class="col-c">
+      <div id="region-area" class="viz"></div>
+      <p class="caption">Combined stock market value by world region as a share of the global total, 1993–2024. Source: World Bank.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PART II ===== -->
+<div id="pt2" class="part-band">
+  <div class="container part-inner">
+    <span class="part-num">II</span>
+    <div>
+      <div class="part-title">How have they performed?</div>
+      <p class="part-intro">Size is only part of the story. Next: what pushed markets up, which market won each year, and how bumpy the ride has been.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 05 -->
+<div class="rv container section">
+  <div class="sec-grid">
+    <div class="col-t">
+      <p class="sec-label">06 · Interest rates</p>
+      <h2>Cheaper money, bigger markets</h2>
+      <p class="body-text">When the Reserve Bank cuts interest rates, bank savings earn less and borrowing gets cheaper, so more money flows into shares.</p>
+      <p class="body-text">As rates fell toward zero, <span class="aus">Australia's</span> market grew from 35% of GDP in 1990 to 129% in 2020. Since rates rose again, it has slipped back to 99%, while the <span class="usa">US</span> has kept climbing.</p>
+      <div class="key-fig">
+        <div class="kf-num">12%→0.1%</div>
+        <div class="kf-label"><span class="aus">Australia's</span> cash rate, 1990 to 2020</div>
+      </div>
+      <p class="annotation">Each dot is one year, joined in order; older years are fainter. <strong>Hover</strong> a dot for exact figures.</p>
+    </div>
+    <div class="col-c">
+      <div id="scatter-rates-vs-market" class="viz"></div>
+      <p class="caption">Central bank policy rate at year end (IMF) against market value as % of GDP (World Bank), 1990–2024.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 06 -->
+<div class="rv container section divider">
+  <div class="sec-grid sec-grid-rev">
+    <div class="col-c">
+      <div id="bump-yearly-rank" class="viz"></div>
+      <p class="caption">Change in each country's share price index, December to December, local currency, 2007–2016. Source: IMF.</p>
+    </div>
+    <div class="col-t">
+      <p class="sec-label">07 · Winners and losers</p>
+      <h2>No market stays on top for long</h2>
+      <p class="body-text">Each year, eight major markets are ranked by how much their share price index rose or fell. The leader changes almost every year: Hong Kong topped 2007 and 2009, and Japan led from 2013 to 2015.</p>
+      <p class="body-text"><span class="aus">Australia</span> never came first, but in nine of these ten years it finished between 3rd and 6th.</p>
+      <div class="key-fig">
+        <div class="kf-num">0 of 10</div>
+        <div class="kf-label">Years in which <span class="aus">Australia</span> topped the table</div>
+      </div>
+      <p class="annotation"><strong>Hover</strong> a dot to follow one market and see its yearly change.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 07 -->
+<div class="rv container section divider">
+  <div class="sec-grid">
+    <div class="col-t">
+      <p class="sec-label">08 · Ups and downs</p>
+      <h2>Australia is one of the steadier markets</h2>
+      <p class="body-text">Each row shows a market's yearly changes from 1997 to 2016. The white line marks a typical year (the middle value), the box covers the middle half of years, and the thin lines reach out to the best and worst years.</p>
+      <p class="body-text"><span class="aus">Australia's</span> worst year (2008, <span class="fall">−41%</span>) and best year (2009, +31%) were milder than in most markets.</p>
+      <div class="key-fig">
+        <div class="kf-num">+8%</div>
+        <div class="kf-label"><span class="aus">Australia's</span> typical yearly change in share prices</div>
+      </div>
+      <p class="annotation">Markets are sorted by their typical year. Brazil's +152% in 1999 runs off the right edge.</p>
+    </div>
+    <div class="col-c">
+      <div id="boxplot-yearly-returns" class="viz"></div>
+      <p class="caption">Yearly change in share price index, December to December, local currency, 1997–2016. Source: IMF.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 09 -->
+<div class="rv container section divider">
+  <div class="sec-grid sec-grid-rev">
+    <div class="col-c">
+      <div id="aus-rolling-return" class="viz"></div>
+      <p class="caption">12-month rolling return on share price index, local currency. Source: IMF.</p>
+    </div>
+    <div class="col-t">
+      <p class="sec-label">09 · Tracking the US</p>
+      <h2>Australia followed the US closely — until the tech gap opened</h2>
+      <p class="body-text">Through the 1990s boom, the dot-com crash and the GFC, <span class="aus">Australia's</span> and the <span class="usa">United States'</span> 12-month returns stayed close together. Both fell sharply in 2008 and recovered together by 2012.</p>
+      <p class="body-text">After that, the US pulled steadily higher as its technology stocks surged. Australia, without a comparable tech sector, lagged behind.</p>
+      <div class="key-fig key-fig-blue">
+        <div class="kf-num">+20 pp</div>
+        <div class="kf-label">Typical gap between US and Australian 12-month returns, 2014–2017</div>
+      </div>
+      <p class="annotation"><strong>Hover</strong> a line to see the exact return for each month.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PART III ===== -->
+<div id="pt3" class="part-band">
+  <div class="container part-inner">
+    <span class="part-num">III</span>
+    <div>
+      <div class="part-title">How are markets connected?</div>
+      <p class="part-intro">Markets don't move alone. A crash in one country spreads quickly, and some markets move almost in lockstep with Australia's.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 08 -->
+<div class="rv container section">
+  <div class="sec-grid sec-grid-rev">
+    <div class="col-c">
+      <p class="chart-title">Share of the world's markets that shrank each year</p>
+      <div id="bar-share-falling" class="viz viz-sm"></div>
+      <p class="chart-title" style="margin-top:20px;">Yearly change in each market's value</p>
+      <div id="heatmap-yearly-change" class="viz"></div>
+      <p class="caption">Year-on-year change in market value of listed domestic companies, current US$, 1991–2024. Source: World Bank.</p>
+    </div>
+    <div class="col-t">
+      <p class="sec-label">10 · Falling together</p>
+      <h2>When one market falls, most fall with it</h2>
+      <p class="body-text">The bars show what share of the world's markets lost value each year. Below them, each square is one country in one year: <span class="fall">red</span> means its market shrank, <span class="usa">blue</span> means it grew.</p>
+      <p class="body-text">Crises show up as red columns that run through almost every country. In 2008 <span class="aus">Australia's</span> market shrank by 47%. In the strong year of 2003, only 3 of 65 markets fell.</p>
+      <div class="key-fig key-fig-red">
+        <div class="kf-num">68 of 73</div>
+        <div class="kf-label">Markets that shrank in 2008</div>
+      </div>
+      <p class="annotation">Changes are measured in US dollars, so a falling Australian dollar also counts as a fall. Blank squares mean no data for that year.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 09 -->
+<div class="rv container section divider">
+  <div class="sec-grid">
+    <div class="col-t">
+      <p class="sec-label">11 · Moving in step</p>
+      <h2>Australia moves with Canada, not its neighbours</h2>
+      <p class="body-text">Two unrelated markets would rise or fall together about half the time, like two coin tosses. Between 1997 and 2016, Canada moved the same way as <span class="aus">Australia</span> more often than any other market. Both are dominated by miners and banks.</p>
+      <p class="body-text">Australia's Asian neighbours were the least in step: Japan in 61% of months and Thailand in 58%.</p>
+      <div class="key-fig key-fig-blue">
+        <div class="kf-num">80%</div>
+        <div class="kf-label">Months in which Canada's market moved the same way as Australia's</div>
+      </div>
+      <p class="annotation"><strong>Thicker, darker lines</strong> mean a market moves with Australia more often. Hover a dot for its value.</p>
+    </div>
+    <div class="col-c">
+      <div id="map-links-australia" class="viz viz-lg"></div>
+      <p class="caption">Share of months in which each market's share price index moved in the same direction as Australia's, 1997–2016. Source: IMF.</p>
+    </div>
+  </div>
+</div>
+
+<!-- 10 -->
+<div class="rv container section divider">
+  <div class="sec-grid sec-grid-rev">
+    <div class="col-c">
+      <div id="timeline-gfc-recovery" class="viz viz-lg"></div>
+      <p class="caption">Monthly share price index, local currency. Peak is the highest month from January 2007 to June 2008. Price indices leave out dividends. Source: IMF.</p>
+    </div>
+    <div class="col-t">
+      <p class="sec-label">12 · Recovery</p>
+      <h2>Twelve years to get back</h2>
+      <p class="body-text">In the GFC, <span class="aus">Australia's</span> share price index fell <span class="fall">50%</span> between October 2007 and February 2009, and did not regain that peak until July 2019.</p>
+      <p class="body-text">The US took just over 5 years, while Mexico and Chile recovered in under 2. Spain and Italy took more than 17 years.</p>
+      <div class="key-fig">
+        <div class="kf-num">11.8 years</div>
+        <div class="kf-label">For <span class="aus">Australia's</span> share prices to regain their 2007 peak</div>
+      </div>
+      <p class="annotation"><strong>Red</strong> shows the fall to the lowest point. <strong>Blue</strong> shows the climb back to the pre-crisis peak. Faded bars had not recovered when the IMF series ends.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="container footer-inner">
+    <div class="footer-col">
+      <p class="footer-heading">Data</p>
+      <p>World Bank, World Development Indicators: <em>Market capitalization of listed domestic companies (current US$)</em>, CM.MKT.LCAP.CD, and <em>(% of GDP)</em>, CM.MKT.LCAP.GD.ZS. <a href="https://data.worldbank.org/indicator/CM.MKT.LCAP.CD">data.worldbank.org</a><br>
+      International Monetary Fund, Monetary and Financial Statistics: <em>Financial Market Prices</em> (share price indices) and <em>Interest Rates</em> (monetary policy-related rate). <a href="https://data.imf.org">data.imf.org</a><br>
+      Country shapes: Natural Earth 1:110m, via <a href="https://github.com/vega/vega-datasets">vega-datasets</a>.</p>
+    </div>
+    <div class="footer-col">
+      <p class="footer-heading">Notes</p>
+      <p>World Bank charts end at 2024: the preliminary 2025 figure for India doubles from the year before, which suggests an error. IMF share price series for several large markets end between 2017 and 2019. South Africa is left out of the IMF charts because its index is rebased twice. New Zealand figures before July 1998 are left out because they swing erratically from month to month.<br><br>
+      <strong>Ali Alkhatib</strong> · Monash University · FIT3179 Data Visualisation 2, Semester 2 2026 · October 2026<br>
+      Built with Vega-Lite. AI tools (Claude) used for text refinement, layout feedback, data cleaning and code assistance.</p>
+    </div>
+  </div>
+</footer>
+
+<button id="btt" aria-label="Back to top">↑</button>
+
+<script>
+  // Embed all Vega-Lite charts
+  var charts = [
+    'bubble-map-size','choropleth-market-cap','line-trend','dumbbell-change',
+    'region-area',
+    'scatter-rates-vs-market','bump-yearly-rank','boxplot-yearly-returns',
+    'aus-rolling-return',
+    'bar-share-falling','heatmap-yearly-change','map-links-australia',
+    'timeline-gfc-recovery'
+  ];
+  var embedOpts = { actions: false, config: { background: null } };
+  charts.forEach(function(id) {
+    vegaEmbed('#' + id, 'js/vega-specs/' + id + '.json', embedOpts).catch(function(){});
+  });
+
+  // Scroll progress bar
+  var bar = document.getElementById('pg');
+  window.addEventListener('scroll', function() {
+    var h = document.body.scrollHeight - window.innerHeight;
+    if (h > 0) bar.style.width = (window.scrollY / h * 100) + '%';
+  }, { passive: true });
+
+  // Nav active state
+  var navMap = { pt1: 'nv1', pt2: 'nv2', pt3: 'nv3' };
+  var navObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      var lk = document.getElementById(navMap[e.target.id]);
+      if (lk) lk.style.color = e.isIntersecting ? '#1b3a5c' : '';
+    });
+  }, { threshold: 0.05 });
+  Object.keys(navMap).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) navObs.observe(el);
+  });
+
+  // Reveal on scroll
+  var revObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('vis'); revObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.rv').forEach(function(el) { revObs.observe(el); });
+
+  // Counter animation
+  document.querySelectorAll('[data-count]').forEach(function(el) {
+    var target = parseFloat(el.dataset.count);
+    var suffix = el.dataset.suffix || '';
+    var dur = 1400, t0 = Date.now();
+    function tick() {
+      var p = Math.min((Date.now() - t0) / dur, 1);
+      var ease = 1 - Math.pow(1 - p, 3);
+      var val = target * ease;
+      el.textContent = (Number.isInteger(target) ? Math.round(val) : val.toFixed(1)) + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    setTimeout(function() { requestAnimationFrame(tick); }, 300);
+  });
+
+  // Back to top
+  var btn = document.getElementById('btt');
+  window.addEventListener('scroll', function() {
+    btn.style.opacity = window.scrollY > 400 ? '1' : '0';
+    btn.style.pointerEvents = window.scrollY > 400 ? 'auto' : 'none';
+  }, { passive: true });
+  btn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+</script>
+
+</body>
+</html>

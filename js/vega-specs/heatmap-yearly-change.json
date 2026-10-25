@@ -1,0 +1,78 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": {"step": 17},
+  "data": {"url": "data/market-cap-by-country.csv", "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_GDP_Pct": "number", "MarketCap_Billion_USD": "number", "Code_Numeric": "number"}}},
+  "transform": [
+    {"filter": "datum.Year <= 2024"},
+    {
+      "filter": "indexof(['AUS','NZL','USA','CAN','BRA','MEX','GBR','FRA','DEU','CHE','ESP','CHN','JPN','IND','HKG','KOR','SGP','MYS','IDN','THA','SAU','ZAF'], datum.Code) >= 0"
+    },
+    {
+      "window": [
+        {"op": "lag", "field": "MarketCap_Billion_USD", "as": "PrevCap"},
+        {"op": "lag", "field": "Year", "as": "PrevYear"}
+      ],
+      "groupby": ["Code"],
+      "sort": [{"field": "Year", "order": "ascending"}]
+    },
+    {"filter": "datum.PrevYear == datum.Year - 1 && datum.PrevCap > 0"},
+    {"calculate": "(datum.MarketCap_Billion_USD / datum.PrevCap - 1) * 100", "as": "Change"},
+    {
+      "lookup": "Code",
+      "from": {"data": {"url": "data/countries.csv", "format": {"type": "csv", "parse": {"Lon": "number", "Lat": "number"}}}, "key": "Code", "fields": ["Name", "Region"]}
+    },
+    {"calculate": "(datum.Change > 0 ? '+' : '') + format(datum.Change, '.0f') + '%'", "as": "ChangeLabel"},
+    {
+      "calculate": "indexof(['AUS','NZL','USA','CAN','BRA','MEX','GBR','FRA','DEU','CHE','ESP','CHN','JPN','IND','HKG','KOR','SGP','MYS','IDN','THA','SAU','ZAF'], datum.Code)",
+      "as": "RegionOrder"
+    }
+  ],
+  "mark": {"type": "rect", "stroke": "#faf6ee", "strokeWidth": 1},
+  "encoding": {
+    "x": {
+      "field": "Year",
+      "type": "ordinal",
+      "scale": {"domain": {"expr": "sequence(1991, 2025)"}, "paddingInner": 0},
+      "axis": {"title": null, "labelAngle": 0, "labelExpr": "datum.value % 5 == 0 ? datum.value : ''", "ticks": false, "domain": false}
+    },
+    "y": {
+      "field": "Name",
+      "type": "nominal",
+      "sort": {"field": "RegionOrder", "op": "min"},
+      "axis": {
+        "title": null,
+        "ticks": false,
+        "domain": false,
+        "labelFontWeight": {"expr": "datum.label == 'Australia' ? 700 : 400"},
+        "labelColor": {"expr": "datum.label == 'Australia' ? '#b8430a' : '#555555'"},
+        "minExtent": 110,
+        "maxExtent": 110
+      }
+    },
+    "color": {
+      "field": "Change",
+      "type": "quantitative",
+      "scale": {"scheme": "redblue", "domain": [-60, 0, 60], "clamp": true},
+      "legend": {
+        "title": "Change on previous year (US$)",
+        "orient": "bottom",
+        "direction": "horizontal",
+        "gradientLength": 260,
+        "labelExpr": "(datum.value > 0 ? '+' : '') + datum.value + '%'"
+      }
+    },
+    "tooltip": [
+      {"field": "Name", "title": "Country"},
+      {"field": "Year", "title": "Year"},
+      {"field": "ChangeLabel", "title": "Change in US$ value"}
+    ]
+  },
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "padding": {"left": 5, "top": 0, "bottom": 5, "right": 5},
+    "axis": {"labelFontSize": 11, "labelColor": "#666"},
+    "legend": {"titleFontSize": 11, "labelFontSize": 11, "titleColor": "#555", "labelColor": "#555"}
+  }
+}

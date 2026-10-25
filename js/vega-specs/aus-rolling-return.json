@@ -1,0 +1,91 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 240,
+  "data": {
+    "url": "data/share-price-index.csv",
+    "format": {"type": "csv", "parse": {"Index": "number"}}
+  },
+  "transform": [
+    {"filter": "(datum.Code == 'AUS' || datum.Code == 'USA') && datum.Index > 0 && substring(datum.Month, 5, 7) == '12'"},
+    {"calculate": "toNumber(substring(datum.Month, 0, 4))", "as": "Year"},
+    {
+      "window": [{"op": "lag", "field": "Index", "as": "PrevIndex"}],
+      "groupby": ["Code"],
+      "sort": [{"field": "Year"}]
+    },
+    {"filter": "isValid(datum.PrevIndex) && datum.PrevIndex > 0"},
+    {"calculate": "(datum.Index / datum.PrevIndex - 1) * 100", "as": "Return"},
+    {
+      "lookup": "Code",
+      "from": {"data": {"url": "data/countries.csv"}, "key": "Code", "fields": ["Name"]}
+    },
+    {"calculate": "(datum.Return > 0 ? '+' : '') + format(datum.Return, '.1f') + '%'", "as": "ReturnLabel"},
+    {"calculate": "datum.Code == 'AUS' && (datum.Year == 2001 || datum.Year == 2008) ? (datum.Year == 2001 ? 'Dot-com' : 'GFC') : null", "as": "Event"}
+  ],
+  "encoding": {
+    "x": {
+      "field": "Year",
+      "type": "quantitative",
+      "scale": {"domain": [1995, 2017]},
+      "axis": {"title": null, "format": "d", "tickCount": 6, "grid": false}
+    }
+  },
+  "layer": [
+    {
+      "transform": [{"filter": "isValid(datum.Event)"}],
+      "layer": [
+        {
+          "mark": {"type": "rule", "color": "#d4cfc4", "strokeDash": [3, 3]},
+          "encoding": {}
+        },
+        {
+          "mark": {"type": "text", "align": "left", "dx": 4, "fontSize": 10, "fill": "#b0a898"},
+          "encoding": {
+            "y": {"value": 10},
+            "text": {"field": "Event"}
+          }
+        }
+      ]
+    },
+    {
+      "mark": {"type": "rule", "color": "#aaaaaa", "strokeWidth": 0.8},
+      "encoding": {
+        "y": {"datum": 0, "type": "quantitative"}
+      }
+    },
+    {
+      "mark": {"type": "line", "strokeWidth": 2, "interpolate": "monotone", "point": {"size": 30, "stroke": "#faf6ee", "strokeWidth": 1}},
+      "encoding": {
+        "y": {
+          "field": "Return",
+          "type": "quantitative",
+          "scale": {"domain": [-55, 55]},
+          "axis": {"title": "Annual return (%)", "labelExpr": "datum.value + '%'", "gridColor": "#ebe5d8", "tickCount": 5}
+        },
+        "color": {
+          "field": "Name",
+          "type": "nominal",
+          "scale": {"domain": ["Australia", "United States"], "range": ["#e8590c", "#2f6fb0"]},
+          "legend": {"title": null, "orient": "top-right"}
+        },
+        "detail": {"field": "Code"},
+        "tooltip": [
+          {"field": "Name"},
+          {"field": "Year", "title": "Year"},
+          {"field": "ReturnLabel", "title": "Annual return"}
+        ]
+      }
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "axis": {
+      "labelFontSize": 11, "labelColor": "#666",
+      "titleFontSize": 11, "titleColor": "#666",
+      "domainColor": "#ccc", "tickColor": "#ccc"
+    },
+    "legend": {"labelFontSize": 11, "labelColor": "#555"}
+  }
+}

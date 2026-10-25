@@ -1,0 +1,445 @@
+/* ============================================================
+   Where the World's Money Lives — FIT3179 Data Visualisation 2
+   IBM Plex Serif (headings) + IBM Plex Sans (body)
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  background: #fff;
+  color: #1c1c1e;
+  font-size: 15px;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+a { color: #1b3a5c; text-decoration: none; }
+a:hover { text-decoration: underline; }
+strong { font-weight: 600; color: #1c1c1e; }
+
+.aus  { color: #b8430a; font-weight: 500; }
+.usa  { color: #1d4ed8; font-weight: 500; }
+.fall { color: #b91c1c; font-weight: 500; }
+
+/* ── Layout ── */
+.container {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* ── Progress bar ── */
+#pg {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0;
+  background: #1b3a5c;
+  z-index: 1001;
+  pointer-events: none;
+  transition: width .1s linear;
+}
+
+/* ── Navigation ── */
+nav {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 1000;
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 50px;
+}
+
+.nav-title {
+  font-family: 'IBM Plex Serif', serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1c1c1e;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .4px;
+}
+
+.nav-links a { color: #9ca3af; transition: color .2s; }
+.nav-links a:hover,
+.nav-links a.active { color: #1b3a5c; text-decoration: none; }
+
+/* ── Hero ── */
+.hero {
+  padding: 64px 40px 48px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-family: 'IBM Plex Serif', serif;
+  font-size: 52px;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.5px;
+  color: #0d1b2e;
+  max-width: 800px;
+  margin-bottom: 20px;
+}
+
+.hero-sub {
+  font-size: 17px;
+  font-weight: 300;
+  color: #6b7280;
+  line-height: 1.7;
+  max-width: 600px;
+  margin-bottom: 36px;
+}
+
+/* Stats strip */
+.stats-row {
+  display: flex;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 32px;
+}
+
+.stat-block {
+  padding: 20px 36px 20px 0;
+  margin-right: 36px;
+  border-right: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.stat-block:last-child {
+  border-right: none;
+  margin-right: 0;
+}
+
+.stat-num {
+  font-family: 'IBM Plex Serif', serif;
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.5px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+  max-width: 220px;
+}
+
+/* Chapter nav */
+.chapter-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.chapter-nav a { color: #1b3a5c; }
+.chapter-nav a:hover { text-decoration: underline; }
+
+/* ── Part bands ── */
+.part-band {
+  background: #1b3a5c;
+  color: #fff;
+  margin-top: 16px;
+}
+
+.part-inner {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  padding: 36px 40px;
+}
+
+.part-num {
+  font-family: 'IBM Plex Serif', serif;
+  font-size: 72px;
+  font-weight: 600;
+  line-height: 1;
+  color: rgba(255,255,255,.18);
+  flex-shrink: 0;
+}
+
+.part-title {
+  font-family: 'IBM Plex Serif', serif;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #fff;
+}
+
+.part-intro {
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(255,255,255,.65);
+  margin-top: 6px;
+  max-width: 640px;
+}
+
+/* ── Sections ── */
+.section {
+  padding: 56px 40px;
+}
+
+.divider {
+  border-top: 1px solid #f0f0f0;
+}
+
+.sec-grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.sec-grid-rev {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  gap: 56px;
+  align-items: start;
+}
+
+/* Section label */
+.sec-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #1b3a5c;
+  margin-bottom: 12px;
+}
+
+/* Headings */
+h2 {
+  font-family: 'IBM Plex Serif', serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.18;
+  color: #0d1b2e;
+  margin-bottom: 16px;
+}
+
+h3.chart-title,
+p.chart-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+
+/* Body text */
+.body-text {
+  font-size: 14px;
+  font-weight: 300;
+  color: #4b5563;
+  line-height: 1.8;
+  margin-bottom: 10px;
+  max-width: 440px;
+}
+
+/* Key figure */
+.key-fig {
+  margin: 20px 0;
+  padding-left: 14px;
+  border-left: 3px solid #e8590c;
+}
+
+.key-fig-blue { border-left-color: #1d4ed8; }
+.key-fig-red  { border-left-color: #b91c1c; }
+
+.kf-num {
+  font-family: 'IBM Plex Serif', serif;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1;
+  color: #b8430a;
+  letter-spacing: -.5px;
+}
+
+.key-fig-blue .kf-num { color: #1d4ed8; }
+.key-fig-red  .kf-num { color: #b91c1c; }
+
+.kf-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 5px;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+/* Annotation */
+.annotation {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.7;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 4px;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+
+.dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.dot-blue { background: #2f6fb0; opacity: .8; }
+.dot-ring { border: 1.5px solid #8a8a8a; }
+.dot-aus  { background: #e8590c; }
+
+/* Caption */
+.caption {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* ── Viz containers ── */
+.viz     { width: 100%; min-height: 320px; }
+.viz-lg  { min-height: 450px; }
+.viz-tall{ min-height: 580px; }
+.viz-sm  { min-height: 160px; }
+
+/* Vega slider overrides */
+.vega-embed .vega-bindings {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12px;
+  color: #555;
+  margin-top: 8px;
+}
+
+.vega-embed .vega-bind-name { font-weight: 600; margin-right: 6px; }
+.vega-embed .vega-bindings input[type="range"] {
+  width: 200px;
+  vertical-align: middle;
+  accent-color: #1b3a5c;
+}
+
+/* ── Scroll reveal ── */
+.rv {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .55s ease, transform .55s ease;
+}
+
+.rv.vis {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Footer ── */
+footer {
+  background: #0d1b2e;
+  color: #fff;
+  margin-top: 64px;
+}
+
+.footer-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  padding: 48px 40px 56px;
+}
+
+.footer-heading {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+
+.footer-inner p {
+  font-size: 12px;
+  color: #4b5563;
+  line-height: 1.9;
+}
+
+.footer-inner a { color: #60a5fa; }
+.footer-inner a:hover { text-decoration: underline; }
+.footer-inner strong { color: #9ca3af; }
+
+/* ── Back to top ── */
+#btt {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 40px;
+  height: 40px;
+  background: #1b3a5c;
+  color: #fff;
+  border: none;
+  border-radius: 2px;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s, background .2s;
+  z-index: 999;
+}
+
+#btt:hover { background: #0d2b4e; }
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .hero h1     { font-size: 36px; }
+  .hero-sub    { font-size: 15px; }
+  .stat-num    { font-size: 34px; }
+  .stats-row   { flex-wrap: wrap; }
+  .stat-block  { border-right: none; border-bottom: 1px solid #e5e7eb; padding: 14px 0; min-width: 45%; }
+  .chapter-nav { gap: 8px 16px; font-size: 12px; }
+
+  .sec-grid,
+  .sec-grid-rev { display: flex; flex-direction: column; gap: 24px; }
+  .sec-grid-rev .col-t { order: 1; }
+  .sec-grid-rev .col-c { order: 2; }
+
+  .part-inner { flex-direction: column; gap: 8px; padding: 28px 20px; }
+  .part-num   { font-size: 48px; }
+  .part-title { font-size: 22px; }
+
+  h2 { font-size: 24px; }
+
+  .nav-links  { gap: 12px; font-size: 11px; }
+  .nav-title  { font-size: 12px; }
+
+  .container  { padding: 0 20px; }
+  .section    { padding: 40px 20px; }
+  .footer-inner { grid-template-columns: 1fr; }
+}

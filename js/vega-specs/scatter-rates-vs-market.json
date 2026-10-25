@@ -1,0 +1,70 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 380,
+  "data": {
+    "url": "data/market-cap-by-country.csv",
+    "format": {"type": "csv", "parse": {"Year": "number", "MarketCap_GDP_Pct": "number"}}
+  },
+  "transform": [
+    {"filter": "(datum.Code == 'AUS' || datum.Code == 'USA') && datum.Year >= 1990 && datum.Year <= 2024"},
+    {"calculate": "datum.Code + '-' + datum.Year", "as": "Key"},
+    {
+      "lookup": "Key",
+      "from": {"data": {"url": "data/policy-rates.csv", "format": {"type": "csv", "parse": {"PolicyRate": "number"}}}, "key": "Key", "fields": ["PolicyRate"]}
+    },
+    {"filter": "isValid(datum.PolicyRate)"},
+    {"calculate": "datum.Code == 'AUS' ? 'Australia' : 'United States'", "as": "Name"},
+    {"calculate": "format(datum.MarketCap_GDP_Pct, ',.0f') + '%'", "as": "PctLabel"},
+    {"calculate": "format(datum.PolicyRate, '.2f') + '%'", "as": "RateLabel"}
+  ],
+  "encoding": {
+    "x": {
+      "field": "PolicyRate",
+      "type": "quantitative",
+      "scale": {"domain": [0, 12.5]},
+      "axis": {"title": "Central bank interest rate at year end", "labelExpr": "datum.value + '%'", "gridColor": "#f0f0f0"}
+    },
+    "y": {
+      "field": "MarketCap_GDP_Pct",
+      "type": "quantitative",
+      "scale": {"domain": [0, 250]},
+      "axis": {"title": "Stock market value as % of GDP", "labelExpr": "datum.value + '%'", "gridColor": "#f0f0f0"}
+    },
+    "color": {
+      "field": "Name",
+      "type": "nominal",
+      "scale": {"domain": ["Australia", "United States"], "range": ["#e8590c", "#2f6fb0"]},
+      "legend": {"title": null, "orient": "top-right"}
+    }
+  },
+  "layer": [
+    {
+      "mark": {"type": "line", "strokeWidth": 1.25, "opacity": 0.45},
+      "encoding": {"order": {"field": "Year"}}
+    },
+    {
+      "mark": {"type": "circle", "size": 55, "stroke": "#faf6ee", "strokeWidth": 1},
+      "encoding": {
+        "opacity": {"field": "Year", "type": "quantitative", "scale": {"domain": [1990, 2024], "range": [0.3, 1]}, "legend": null},
+        "tooltip": [
+          {"field": "Name", "title": "Country"},
+          {"field": "Year", "title": "Year"},
+          {"field": "RateLabel", "title": "Interest rate"},
+          {"field": "PctLabel", "title": "Market as % of GDP"}
+        ]
+      }
+    },
+    {
+      "transform": [{"filter": "indexof([1990, 2007, 2020, 2024], datum.Year) >= 0"}],
+      "mark": {"type": "text", "align": "left", "dx": 7, "dy": -7, "fontSize": 10.5, "fontWeight": 600},
+      "encoding": {"text": {"field": "Year"}}
+    }
+  ],
+  "config": {
+    "view": {"stroke": null},
+    "font": "Inter",
+    "axis": {"labelFontSize": 11, "titleFontSize": 11, "labelColor": "#666", "titleColor": "#666", "domainColor": "#ccc", "tickColor": "#ccc"},
+    "legend": {"labelFontSize": 11, "labelColor": "#555"}
+  }
+}
