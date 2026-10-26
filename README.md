@@ -2,7 +2,7 @@
 
 Interactive data visualisation exploring how the world's stock markets compare in size, growth and risk, how they move together, and where Australia fits in.
 
-**Live site:** `https://iozeus.github.io/Data-Viz-VegaLite-International-Markets/`
+**Live site:** `https://iozeus.github.io/Data-Viz-Project-2-repo/`
 
 ## Data Sources
 1. **World Bank, World Development Indicators**: market capitalisation of listed domestic companies (% of GDP and current US$), 1990–2024
