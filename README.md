@@ -15,6 +15,6 @@ Interactive data visualisation exploring how the world's stock markets compare i
 - **GitHub Pages** for hosting
 
 ## Author
-Ali Alkhatib — Monash University, FIT3179 Semester 2 2026
+Ali Alkhatib - Monash University, FIT3179 Semester 2 2026
 
 AI tools (Claude) used for text refinement, layout feedback, and data cleaning - acknowledged per unit policy.
