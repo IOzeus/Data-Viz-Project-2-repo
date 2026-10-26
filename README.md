@@ -1,4 +1,4 @@
-# FIT3179 Data Visualisation 2 — Global Stock Market Performance
+# FIT3179 Data Visualisation 2 - Global Stock Market Performance
 
 Interactive data visualisation exploring how the world's stock markets compare in size, growth and risk, how they move together, and where Australia fits in.
 
@@ -17,4 +17,4 @@ Interactive data visualisation exploring how the world's stock markets compare i
 ## Author
 Ali Alkhatib — Monash University, FIT3179 Semester 2 2026
 
-AI tools (Claude) used for text refinement, layout feedback, and data cleaning — acknowledged per unit policy.
+AI tools (Claude) used for text refinement, layout feedback, and data cleaning - acknowledged per unit policy.
