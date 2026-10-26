@@ -13,6 +13,7 @@ Interactive data visualisation exploring how the world's stock markets compare i
 ## Tools
 - **Vega-Lite** for all maps and charts (specs in `js/vega-specs/`)
 - **GitHub Pages** for hosting
+- **Google Fonts**
 
 ## Author
 Ali Alkhatib - Monash University, FIT3179 Semester 2 2026
